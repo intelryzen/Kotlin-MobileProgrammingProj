@@ -6,15 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.team.screen.AikuCRUDScreen
+import com.example.team.screen.DiaryCorrectionScreen
 import com.example.team.ui.theme.TeamTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AikuCRUDScreen()
+            TeamTheme {
+                DiaryCorrectionScreen()
+            }
         }
     }
 }
@@ -25,12 +26,4 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TeamTheme {
-        Greeting("Android")
-    }
 }
