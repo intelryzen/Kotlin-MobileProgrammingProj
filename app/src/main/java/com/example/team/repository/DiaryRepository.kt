@@ -1,3 +1,7 @@
+
+
+// 일기 수정 api 테스트용 repository
+
 package com.example.team.repository
 
 import com.example.team.model.DiaryApiResponse

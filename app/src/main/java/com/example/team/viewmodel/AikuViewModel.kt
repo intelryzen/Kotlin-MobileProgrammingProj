@@ -1,3 +1,6 @@
+
+// DB CRUD 테스트용 뷰모델
+
 package com.example.team.viewmodel
 
 import android.app.Application

@@ -1,3 +1,6 @@
+
+// API 테스트용 뷰
+
 package com.example.team.screen
 
 import androidx.compose.foundation.layout.Column
@@ -29,11 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.team.viewmodel.DiaryViewModel
+import com.example.team.viewmodel.DiaryApiViewModel
 
 @Composable
 fun DiaryCorrectionScreen(
-    viewModel: DiaryViewModel = viewModel()
+    viewModel: DiaryApiViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

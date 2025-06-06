@@ -1,3 +1,6 @@
+
+// API 테스트용 뷰모델
+
 package com.example.team.viewmodel
 
 import androidx.lifecycle.ViewModel
@@ -16,7 +19,7 @@ data class DiaryUiState(
     val isSuccess: Boolean = false
 )
 
-class DiaryViewModel : ViewModel() {
+class DiaryApiViewModel : ViewModel() {
     
     private val repository = DiaryRepository()
     

@@ -6,15 +6,25 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.team.screen.DiaryCorrectionScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.team.nav.SeeAppNavGraph
 import com.example.team.ui.theme.TeamTheme
+import com.example.team.viewmodel.diary.DiaryViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TeamTheme {
-                DiaryCorrectionScreen()
+                val diaryViewModel: DiaryViewModel = viewModel()
+                val navController = rememberNavController()
+                SeeAppNavGraph(navController = navController, diaryViewModel = diaryViewModel)
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    Greeting(
+//                        name = "Android",
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
             }
         }
     }
