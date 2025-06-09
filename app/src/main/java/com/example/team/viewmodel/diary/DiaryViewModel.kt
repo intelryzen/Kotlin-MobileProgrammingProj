@@ -9,6 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.team.repository.DiaryRepository
 import com.example.team.roomDB.DiaryEntity
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
     var diaryList = mutableStateListOf<DiaryEntry>()
@@ -32,14 +35,23 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
                 val result = repository.getAllDiaries()
                 if (result.isSuccess) {
                     val diaryEntities = result.getOrNull() ?: emptyList()
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val diaryEntries = diaryEntities.map { entity ->
+                        // DiaryEntity의 createdDate를 Date 객체로 변환
+                        val createdDate = try {
+                            dateFormat.parse(entity.createdDate) ?: Date()
+                        } catch (e: Exception) {
+                            Date() // 파싱 실패 시 현재 시간으로 대체
+                        }
+                        
                         DiaryEntry(
                             id = entity.id,
                             title = entity.title,
                             content = entity.content,
                             editedContent = entity.correctedContent,
                             isOriginal = true,
-                            wordCollect = false
+                            wordCollect = false,
+                            createdAt = createdDate
                         )
                     }
                     diaryList.clear()
@@ -52,7 +64,10 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
     }
 
     fun createNewDiary(){
-        val newDiary = DiaryEntry(id = getNextId())
+        val newDiary = DiaryEntry(
+            id = getNextId(),
+            createdAt = Date() // 새 일기는 현재 시간으로 설정
+        )
         diaryList.add(0, newDiary) // 맨 앞에 추가 (최신순)
         currentDiaryIndex = 0
     }
@@ -89,8 +104,8 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
                     val correctedContent = result.getOrNull() ?: diary.content
                     diary.editedContent = correctedContent
                     onSuccess("일기가 성공적으로 저장되었습니다!")
-                    // 저장 후 데이터베이스에서 다시 로드하여 동기화
-                    loadDiariesFromDatabase()
+                    // 저장 후에는 데이터베이스를 다시 로드하지 않고 현재 상태를 유지
+                    // loadDiariesFromDatabase() 제거하여 입력값 유지
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "알 수 없는 오류가 발생했습니다."
                     errorMessage = error
