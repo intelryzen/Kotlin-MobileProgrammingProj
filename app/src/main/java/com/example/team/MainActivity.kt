@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.team.nav.NavGraph
+import com.example.team.repository.ChatRepository
 import com.example.team.repository.DiaryRepository
 import com.example.team.repository.VocabularyRepository
 import com.example.team.ui.theme.TeamTheme
@@ -22,8 +23,9 @@ class MainActivity : ComponentActivity() {
                 val database = AikuDatabase.getDatabase(this@MainActivity)
                 val diaryRepository = DiaryRepository(database.diaryDao())
                 val vocabularyRepository = VocabularyRepository(database.vocabDao())
+                val chatRepository = ChatRepository()
                 val diaryViewModel: DiaryViewModel = viewModel { 
-                    DiaryViewModel(diaryRepository, vocabularyRepository) 
+                    DiaryViewModel(diaryRepository, vocabularyRepository, chatRepository) 
                 }
                 val navController = rememberNavController()
                 NavGraph(navController = navController, diaryViewModel = diaryViewModel)

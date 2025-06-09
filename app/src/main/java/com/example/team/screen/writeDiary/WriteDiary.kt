@@ -336,7 +336,10 @@ fun WriteDiary(
 //        }
 
         if (showPopup) {
-            QnAPopup(onClose = { showPopup = false })
+            QnAPopup(
+                viewModel = viewModel,
+                onClose = { showPopup = false }
+            )
         }
 
         if (showVocabularySelection) {

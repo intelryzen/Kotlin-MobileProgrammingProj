@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.team.model.VocabularyItem
+import com.example.team.repository.ChatRepository
 import com.example.team.repository.DiaryRepository
 import com.example.team.repository.VocabularyRepository
 import com.example.team.roomDB.DiaryEntity
@@ -17,7 +18,8 @@ import java.util.Locale
 
 class DiaryViewModel(
     private val repository: DiaryRepository,
-    private val vocabularyRepository: VocabularyRepository? = null
+    private val vocabularyRepository: VocabularyRepository? = null,
+    private val chatRepository: ChatRepository? = null
 ) : ViewModel() {
     var diaryList = mutableStateListOf<DiaryEntry>()
         private set
@@ -405,6 +407,63 @@ class DiaryViewModel(
                 }
             } catch (e: Exception) {
                 val error = "단어 저장 중 오류가 발생했습니다: ${e.message}"
+                errorMessage = error
+                onError(error)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    // Q&A 기능
+    fun askQuestionAboutDiary(question: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        val diary = currentDiary
+        if (diary == null) {
+            onError("일기가 선택되지 않았습니다.")
+            return
+        }
+
+        if (chatRepository == null) {
+            onError("Q&A 기능을 사용할 수 없습니다.")
+            return
+        }
+
+        if (question.isBlank()) {
+            onError("질문을 입력해주세요.")
+            return
+        }
+
+        val userDiary = diary.content
+        val gptDiary = diary.editedContent
+
+        if (userDiary.isBlank()) {
+            onError("원본 일기 내용이 없습니다.")
+            return
+        }
+
+        if (gptDiary.isBlank()) {
+            onError("수정된 일기 내용이 없습니다.")
+            return
+        }
+
+        isLoading = true
+        errorMessage = null
+
+        viewModelScope.launch {
+            try {
+                val result = chatRepository.askQuestion(userDiary, gptDiary, question)
+
+                if (result.isSuccess) {
+                    val apiResponse = result.getOrNull()
+                    val answer = apiResponse?.data?.firstOrNull() ?: "답변을 받을 수 없습니다."
+                    onSuccess(answer)
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "질문 처리 중 오류가 발생했습니다."
+                    errorMessage = error
+                    onError(error)
+                }
+            } catch (e: Exception) {
+                val error = "질문 처리 중 오류가 발생했습니다: ${e.message}"
                 errorMessage = error
                 onError(error)
             } finally {
