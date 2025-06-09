@@ -191,7 +191,8 @@ fun WriteDiary(
                                 content = content,
                                 onSuccess = { message ->
                                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                    navController.popBackStack()
+                                    // 저장 후 수정된 일기 탭으로 자동 전환
+                                    viewModel.currentDiary?.let { it.isOriginal = false }
                                 },
                                 onError = { error ->
                                     Toast.makeText(context, error, Toast.LENGTH_LONG).show()
