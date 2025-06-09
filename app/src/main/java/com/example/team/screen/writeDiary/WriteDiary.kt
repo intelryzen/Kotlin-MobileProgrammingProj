@@ -47,7 +47,15 @@ fun WriteDiary(
     navController: NavController
 ) {
     val diary = viewModel.currentDiary
+    val isNewDiary = viewModel.currentDiaryIndex == -1
     var showPopup by remember { mutableStateOf(false) }
+    
+    // 새 일기 작성용 상태
+    var title by remember { mutableStateOf(diary?.title ?: "") }
+    var content by remember { mutableStateOf(diary?.content ?: "") }
+    var editedContent by remember { mutableStateOf(diary?.editedContent ?: "") }
+    var isOriginal by remember { mutableStateOf(true) }
+    
     val dateTimeFormatter = remember {
         SimpleDateFormat("yyyy년 M월 d일 (HH:mm)", Locale.getDefault())
     }
@@ -62,13 +70,6 @@ fun WriteDiary(
     }
 
     val context = LocalContext.current
-
-    if (diary == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("작성 중인 일기가 없습니다.\n[새 일기] 버튼을 눌러 시작해 주세요.", fontSize = 16.sp)
-        }
-        return
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -101,37 +102,58 @@ fun WriteDiary(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = diary.title,
-                onValueChange = { diary.title = it },
+                value = if (isNewDiary) title else diary?.title ?: "",
+                onValueChange = { 
+                    if (isNewDiary) title = it
+                    else diary?.let { title = it.title }
+                },
                 label = { Text("제목") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Row {
-                Text(
-                    text = "내가 쓴 일기", fontWeight = FontWeight.Bold,
-                    color = if (diary.isOriginal) Color.Black else Color.Gray,
-                    modifier = Modifier.clickable { diary.isOriginal = true }
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "| 수정된 일기",
-                    color = if (!diary.isOriginal) Color.Black else Color.Gray,
-                    modifier = Modifier.clickable {
-                        diary.isOriginal = false
-                    }
-                )
+            
+            if (!isNewDiary && diary != null) {
+                Row {
+                    Text(
+                        text = "내가 쓴 일기", fontWeight = FontWeight.Bold,
+                        color = if (diary.isOriginal) Color.Black else Color.Gray,
+                        modifier = Modifier.clickable { diary.isOriginal = true }
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "| 수정된 일기",
+                        color = if (!diary.isOriginal) Color.Black else Color.Gray,
+                        modifier = Modifier.clickable {
+                            diary.isOriginal = false
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = if (diary.isOriginal) diary.content else diary.editedContent,
-                onValueChange = { newValue ->
-                    if (diary.isOriginal) diary.content = newValue
-                    else diary.editedContent = newValue
+                value = if (isNewDiary) {
+                    content
+                } else if (diary?.isOriginal == true) {
+                    diary.content
+                } else {
+                    diary?.editedContent ?: ""
                 },
-                label = { Text(if (diary.isOriginal) "내용" else "수정된 내용") },
+                onValueChange = { newValue ->
+                    if (isNewDiary) {
+                        content = newValue
+                    } else if (diary?.isOriginal == true) {
+                        diary?.let { it.content = newValue }
+                    } else {
+                        diary?.let { it.editedContent = newValue }
+                    }
+                },
+                label = { Text(
+                    if (isNewDiary) "내용" 
+                    else if (diary?.isOriginal == true) "내용" 
+                    else "수정된 내용"
+                ) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
@@ -149,17 +171,32 @@ fun WriteDiary(
             ) {
                 Button(
                     onClick = {
-                        // 일기 저장 및 API 호출
-                        viewModel.saveDiary(
-                            onSuccess = { message ->
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                // 저장 후 수정된 일기 탭으로 자동 전환
-                                diary.isOriginal = false
-                            },
-                            onError = { error ->
-                                Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                            }
-                        )
+                        if (isNewDiary) {
+                            // 새 일기 저장
+                            viewModel.saveNewDiary(
+                                title = title,
+                                content = content,
+                                onSuccess = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack()
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        } else {
+                            // 기존 일기 저장
+                            viewModel.saveDiary(
+                                onSuccess = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    // 저장 후 수정된 일기 탭으로 자동 전환
+                                    diary?.let { it.isOriginal = false }
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        }
                     },
                     enabled = !viewModel.isLoading
                 ) {
@@ -172,30 +209,32 @@ fun WriteDiary(
                         Text("저장")
                     }
                 }
-                Button(onClick = {
-                    /* 일기 수정 완료*/
-                    Toast.makeText(context, "일기 수정이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                }) {
-                    Text("수정")
-                }
-                Button(onClick = {
-                    /* 일기 삭제 완료*/
-                    viewModel.deleteCurrentDiary()
-                    Toast.makeText(context, "일기 삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack("main", inclusive = false)
-                }) {
-                    Text("삭제")
-                }
-                if (!diary.isOriginal) {
-                    Button(
-                        onClick = { /*단어수집동작 */
-                            diary.wordCollect = !diary.wordCollect
-                        }
+                if (!isNewDiary && diary != null) {
+                    Button(onClick = {
+                        /* 일기 수정 완료*/
+                        Toast.makeText(context, "일기 수정이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                    }) {
+                        Text("수정")
+                    }
+                    Button(onClick = {
+                        /* 일기 삭제 완료*/
+                        viewModel.deleteCurrentDiary()
+                        Toast.makeText(context, "일기 삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack("main", inclusive = false)
+                    }) {
+                        Text("삭제")
+                    }
+                    if (!diary.isOriginal) {
+                        Button(
+                            onClick = { /*단어수집동작 */
+                                diary.wordCollect = !diary.wordCollect
+                            }
 
-                    ) {
-                        Text(
-                            "단어 수집"
-                        )
+                        ) {
+                            Text(
+                                "단어 수집"
+                            )
+                        }
                     }
                 }
             }

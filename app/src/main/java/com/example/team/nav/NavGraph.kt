@@ -54,7 +54,7 @@ fun NavGraph(
         }
 
         composable("write") {
-            // 새 다이어리 작성 시 인덱스 초기화
+            // 새 일기 작성 모드로 설정
             diaryViewModel.currentDiaryIndex = -1
             WriteDiary(
                 navController = navController,

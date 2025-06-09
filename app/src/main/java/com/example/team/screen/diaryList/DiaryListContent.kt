@@ -138,7 +138,6 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
         // FloatingActionButton for 새 일기
         FloatingActionButton(
             onClick = {
-                viewModel.createNewDiary()
                 onCreateNewDiaryClick()
             },
             modifier = Modifier
