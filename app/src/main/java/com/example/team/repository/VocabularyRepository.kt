@@ -134,6 +134,33 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
             }
         }
     }
+
+    suspend fun saveSelectedVocabularyWords(selectedItems: List<VocabularyItem>): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val saveResult = saveVocabularyWords(selectedItems)
+                
+                if (saveResult.isFailure) {
+                    return@withContext Result.failure(saveResult.exceptionOrNull() ?: Exception("단어 저장 실패"))
+                }
+                
+                val newWordsCount = saveResult.getOrNull() ?: 0
+                val totalWordsCount = selectedItems.size
+                
+                val message = if (newWordsCount == 0) {
+                    "선택한 모든 단어가 이미 존재합니다."
+                } else if (newWordsCount == totalWordsCount) {
+                    "${newWordsCount}개의 새로운 단어를 추가했습니다."
+                } else {
+                    "선택한 ${totalWordsCount}개 단어 중 ${newWordsCount}개의 새로운 단어를 추가했습니다."
+                }
+                
+                Result.success(message)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
     
     suspend fun getAllVocabulary(): Result<List<VocabEntity>> {
         return withContext(Dispatchers.IO) {

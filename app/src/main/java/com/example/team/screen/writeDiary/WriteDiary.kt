@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.team.model.VocabularyItem
 import com.example.team.viewmodel.diary.DiaryViewModel
 import com.example.team.viewmodel.VocabularyViewModel
 import java.text.SimpleDateFormat
@@ -52,6 +53,8 @@ fun WriteDiary(
     val diary = viewModel.currentDiary
     val isNewDiary = viewModel.currentDiaryIndex == -1
     var showPopup by remember { mutableStateOf(false) }
+    var showVocabularySelection by remember { mutableStateOf(false) }
+    var vocabularyItems by remember { mutableStateOf<List<VocabularyItem>>(emptyList()) }
 
     // 뒤로가기 버튼 연속 클릭 방지
     var isBackButtonEnabled by remember { mutableStateOf(true) }
@@ -270,18 +273,15 @@ fun WriteDiary(
 
                     // 수정된 일기 탭에서만 단어 수집 버튼 표시
                     if (!diary.isOriginal) {
-                        Button(
-                            onClick = {
-                                viewModel.collectVocabularyFromCurrentDiary(
-                                    onSuccess = { message ->
-                                        diary.wordCollect = true
-                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                                Button(
+                            onClick = { 
+                                viewModel.collectVocabularyForSelection(
+                                    onSuccess = { items ->
+                                        vocabularyItems = items
+                                        showVocabularySelection = true
                                     },
                                     onError = { error ->
                                         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                                    },
-                                    onVocabularyUpdated = {
-                                        vocabularyViewModel?.refreshVocabulary()
                                     }
                                 )
                             },
@@ -322,6 +322,31 @@ fun WriteDiary(
 
         if (showPopup) {
             QnAPopup(onClose = { showPopup = false })
+        }
+
+        if (showVocabularySelection) {
+            VocabularySelectionPopup(
+                vocabularyItems = vocabularyItems,
+                onSaveSelected = { selectedItems ->
+                    viewModel.saveSelectedVocabulary(
+                        selectedItems = selectedItems,
+                        onSuccess = { message ->
+                            diary?.let { it.wordCollect = true }
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            showVocabularySelection = false
+                        },
+                        onError = { error ->
+                            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                        },
+                        onVocabularyUpdated = {
+                            vocabularyViewModel?.refreshVocabulary()
+                        }
+                    )
+                },
+                onDismiss = {
+                    showVocabularySelection = false
+                }
+            )
         }
     }
 }
