@@ -194,4 +194,50 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
             }
         }
     }
+
+    // 기존 일기 수정
+    fun updateCurrentDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        val diary = currentDiary
+        if (diary == null) {
+            onError("수정할 일기가 없습니다.")
+            return
+        }
+
+        if (diary.title.isBlank() || diary.content.isBlank()) {
+            onError("제목과 내용을 모두 입력해주세요.")
+            return
+        }
+
+        isLoading = true
+        errorMessage = null
+
+        viewModelScope.launch {
+            try {
+                val result = repository.updateDiary(
+                    diaryId = diary.id,
+                    title = diary.title,
+                    content = diary.content,
+                    correctedContent = diary.editedContent.takeIf { it.isNotEmpty() }
+                )
+
+                if (result.isSuccess) {
+                    val updatedCorrectedContent = result.getOrNull() ?: diary.editedContent
+                    // 메모리의 일기도 업데이트
+                    diary.editedContent = updatedCorrectedContent
+                    
+                    onSuccess("일기가 성공적으로 수정되었습니다!")
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "수정 중 오류가 발생했습니다."
+                    errorMessage = error
+                    onError(error)
+                }
+            } catch (e: Exception) {
+                val error = "수정 중 오류가 발생했습니다: ${e.message}"
+                errorMessage = error
+                onError(error)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }

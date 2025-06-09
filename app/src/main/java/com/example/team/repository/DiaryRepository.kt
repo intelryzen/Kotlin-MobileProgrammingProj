@@ -139,4 +139,43 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
             }
         }
     }
+
+    suspend fun updateDiary(diaryId: Int, title: String, content: String, correctedContent: String? = null): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                // ID로 일기를 찾기
+                val diaries = diaryDao.getAllSync()
+                val diaryToUpdate = diaries.find { it.id == diaryId }
+                
+                if (diaryToUpdate == null) {
+                    return@withContext Result.failure(Exception("수정할 일기를 찾을 수 없습니다."))
+                }
+
+                // 수정된 내용이 제공되지 않았다면 API 호출하여 교정
+                val finalCorrectedContent = if (correctedContent != null) {
+                    correctedContent
+                } else {
+                    val correctionResult = correctDiary(content)
+                    if (correctionResult.isSuccess) {
+                        val apiResponse = correctionResult.getOrNull()
+                        apiResponse?.data?.firstOrNull() ?: content
+                    } else {
+                        content // API 호출 실패 시 원본 내용 사용
+                    }
+                }
+
+                // 기존 일기 엔티티를 복사하여 업데이트
+                val updatedEntity = diaryToUpdate.copy(
+                    title = title,
+                    content = content,
+                    correctedContent = finalCorrectedContent
+                )
+
+                diaryDao.update(updatedEntity)
+                Result.success(finalCorrectedContent)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 } 

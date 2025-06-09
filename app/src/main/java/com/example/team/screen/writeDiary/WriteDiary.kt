@@ -225,11 +225,29 @@ fun WriteDiary(
                     }
                 }
                 if (!isNewDiary && diary != null) {
-                    Button(onClick = {
-                        /* 일기 수정 완료*/
-                        Toast.makeText(context, "일기 수정이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                    }) {
-                        Text("수정")
+                    Button(
+                        onClick = {
+                            viewModel.updateCurrentDiary(
+                                onSuccess = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    // 수정 후 수정된 일기 탭으로 자동 전환
+                                    diary?.let { it.isOriginal = false }
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        },
+                        enabled = !viewModel.isLoading
+                    ) {
+                        if (viewModel.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text("수정")
+                        }
                     }
                     Button(
                         onClick = {
