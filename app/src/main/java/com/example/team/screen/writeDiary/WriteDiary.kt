@@ -50,6 +50,9 @@ fun WriteDiary(
     val isNewDiary = viewModel.currentDiaryIndex == -1
     var showPopup by remember { mutableStateOf(false) }
     
+    // 뒤로가기 버튼 연속 클릭 방지
+    var isBackButtonEnabled by remember { mutableStateOf(true) }
+    
     // 새 일기 작성용 상태
     var title by remember { mutableStateOf(diary?.title ?: "") }
     var content by remember { mutableStateOf(diary?.content ?: "") }
@@ -84,8 +87,11 @@ fun WriteDiary(
                     contentDescription = "뒤로가기",
                     modifier = Modifier
                         .size(22.dp)
-                        .clickable {
-                            navController.popBackStack()
+                        .clickable(enabled = isBackButtonEnabled) {
+                            if (isBackButtonEnabled) {
+                                isBackButtonEnabled = false
+                                navController.popBackStack()
+                            }
                         }
                 )
 
