@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.team.viewmodel.diary.DiaryViewModel
+import com.example.team.viewmodel.VocabularyViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -45,7 +46,8 @@ import java.util.Locale
 @Composable
 fun WriteDiary(
     viewModel: DiaryViewModel,
-    navController: NavController
+    navController: NavController,
+    vocabularyViewModel: VocabularyViewModel? = null
 ) {
     val diary = viewModel.currentDiary
     val isNewDiary = viewModel.currentDiaryIndex == -1
@@ -275,6 +277,9 @@ fun WriteDiary(
                                     },
                                     onError = { error ->
                                         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                    },
+                                    onVocabularyUpdated = {
+                                        vocabularyViewModel?.refreshVocabulary()
                                     }
                                 )
                             },

@@ -59,7 +59,8 @@ fun NavGraph(
             }
             WriteDiary(
                 navController = navController,
-                viewModel = diaryViewModel
+                viewModel = diaryViewModel,
+                vocabularyViewModel = vocabularyViewModel
             )
         }
 
@@ -76,7 +77,8 @@ fun NavGraph(
             diaryViewModel.currentDiaryIndex = -1
             WriteDiary(
                 navController = navController,
-                viewModel = diaryViewModel
+                viewModel = diaryViewModel,
+                vocabularyViewModel = vocabularyViewModel
             )
         }
     }

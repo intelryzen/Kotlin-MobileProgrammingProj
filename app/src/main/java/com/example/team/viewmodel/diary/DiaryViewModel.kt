@@ -275,7 +275,7 @@ class DiaryViewModel(
     }
 
     // 단어 수집 기능
-    fun collectVocabularyFromCurrentDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    fun collectVocabularyFromCurrentDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit, onVocabularyUpdated: (() -> Unit)? = null) {
         val diary = currentDiary
         if (diary == null) {
             onError("일기가 선택되지 않았습니다.")
@@ -307,6 +307,7 @@ class DiaryViewModel(
 
                 if (result.isSuccess) {
                     val message = result.getOrNull() ?: "단어 수집이 완료되었습니다."
+                    onVocabularyUpdated?.invoke() // VocabularyViewModel 갱신
                     onSuccess(message)
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "단어 수집 중 오류가 발생했습니다."
