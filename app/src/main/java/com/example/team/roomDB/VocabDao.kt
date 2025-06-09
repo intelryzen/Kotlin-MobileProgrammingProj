@@ -13,8 +13,17 @@ interface VocabDao {
     @Query("SELECT * FROM vocab ORDER BY createdDate DESC")
     fun getAllSortedByDate(): LiveData<List<VocabEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vocab: VocabEntity)
+    @Query("SELECT * FROM vocab ORDER BY createdDate DESC")
+    suspend fun getAllSync(): List<VocabEntity>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM vocab WHERE word = :word LIMIT 1)")
+    suspend fun isWordExists(word: String): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(vocab: VocabEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(vocabs: List<VocabEntity>): List<Long>
 
     @Update
     fun update(vocab: VocabEntity)

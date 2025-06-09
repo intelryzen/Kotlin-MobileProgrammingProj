@@ -268,17 +268,26 @@ fun WriteDiary(
                     if (!diary.isOriginal) {
                         Button(
                             onClick = { 
-                                diary.wordCollect = !diary.wordCollect
-                                Toast.makeText(
-                                    context, 
-                                    if (diary.wordCollect) "단어 수집이 활성화되었습니다" else "단어 수집이 비활성화되었습니다", 
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                                viewModel.collectVocabularyFromCurrentDiary(
+                                    onSuccess = { message ->
+                                        diary.wordCollect = true
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    },
+                                    onError = { error ->
+                                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                    }
+                                )
+                            },
+                            enabled = !viewModel.isLoading
                         ) {
-                            Text(
-                                if (diary.wordCollect) "단어 수집 해제" else "단어 수집"
-                            )
+                            if (viewModel.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = Color.White
+                                )
+                            } else {
+                                Text("단어 수집")
+                            }
                         }
                     }
                 }

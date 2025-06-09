@@ -7,13 +7,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.team.repository.DiaryRepository
+import com.example.team.repository.VocabularyRepository
 import com.example.team.roomDB.DiaryEntity
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
+class DiaryViewModel(
+    private val repository: DiaryRepository,
+    private val vocabularyRepository: VocabularyRepository? = null
+) : ViewModel() {
     var diaryList = mutableStateListOf<DiaryEntry>()
         private set
     var currentDiaryIndex by mutableStateOf(-1)
@@ -262,6 +266,55 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
                 }
             } catch (e: Exception) {
                 val error = "수정 중 오류가 발생했습니다: ${e.message}"
+                errorMessage = error
+                onError(error)
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    // 단어 수집 기능
+    fun collectVocabularyFromCurrentDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        val diary = currentDiary
+        if (diary == null) {
+            onError("일기가 선택되지 않았습니다.")
+            return
+        }
+
+        if (vocabularyRepository == null) {
+            onError("단어 수집 기능을 사용할 수 없습니다.")
+            return
+        }
+
+        val contentToAnalyze = if (!diary.isOriginal && diary.editedContent.isNotEmpty()) {
+            diary.editedContent
+        } else {
+            diary.content
+        }
+
+        if (contentToAnalyze.isBlank()) {
+            onError("분석할 일기 내용이 없습니다.")
+            return
+        }
+
+        isLoading = true
+        errorMessage = null
+
+        viewModelScope.launch {
+            try {
+                val result = vocabularyRepository.collectAndSaveVocabulary(contentToAnalyze)
+
+                if (result.isSuccess) {
+                    val message = result.getOrNull() ?: "단어 수집이 완료되었습니다."
+                    onSuccess(message)
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "단어 수집 중 오류가 발생했습니다."
+                    errorMessage = error
+                    onError(error)
+                }
+            } catch (e: Exception) {
+                val error = "단어 수집 중 오류가 발생했습니다: ${e.message}"
                 errorMessage = error
                 onError(error)
             } finally {

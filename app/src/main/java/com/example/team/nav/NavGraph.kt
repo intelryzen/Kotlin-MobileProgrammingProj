@@ -2,20 +2,37 @@ package com.example.team.nav
 
 import DiaryListScreen
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.example.team.AikuDatabase
+import com.example.team.repository.VocabularyRepository
 import com.example.team.screen.vocabulary.VocabularyScreen
 import com.example.team.screen.writeDiary.WriteDiary
 import com.example.team.viewmodel.diary.DiaryViewModel
+import com.example.team.viewmodel.VocabularyViewModel
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     diaryViewModel: DiaryViewModel
 ) {
+    val context = LocalContext.current
+    
+    // VocabularyRepository와 VocabularyViewModel 생성
+    val vocabularyRepository = remember {
+        val database = AikuDatabase.getDatabase(context)
+        VocabularyRepository(database.vocabDao())
+    }
+    
+    val vocabularyViewModel = remember {
+        VocabularyViewModel(vocabularyRepository)
+    }
+    
     NavHost(
         navController = navController, 
         startDestination = "main"
@@ -49,7 +66,8 @@ fun NavGraph(
         composable("vocabulary") {
             VocabularyScreen(
                 navController = navController,
-                viewModel = diaryViewModel
+                viewModel = diaryViewModel,
+                vocabularyViewModel = vocabularyViewModel
             )
         }
 
