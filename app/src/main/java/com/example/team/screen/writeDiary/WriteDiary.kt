@@ -103,9 +103,12 @@ fun WriteDiary(
 
             OutlinedTextField(
                 value = if (isNewDiary) title else diary?.title ?: "",
-                onValueChange = { 
-                    if (isNewDiary) title = it
-                    else diary?.let { title = it.title }
+                onValueChange = { newValue ->
+                    if (isNewDiary) {
+                        title = newValue
+                    } else {
+                        diary?.let { it.title = newValue }
+                    }
                 },
                 label = { Text("제목") },
                 modifier = Modifier.fillMaxWidth()
@@ -143,10 +146,14 @@ fun WriteDiary(
                 onValueChange = { newValue ->
                     if (isNewDiary) {
                         content = newValue
-                    } else if (diary?.isOriginal == true) {
-                        diary?.let { it.content = newValue }
                     } else {
-                        diary?.let { it.editedContent = newValue }
+                        diary?.let { currentDiary ->
+                            if (currentDiary.isOriginal) {
+                                currentDiary.content = newValue
+                            } else {
+                                currentDiary.editedContent = newValue
+                            }
+                        }
                     }
                 },
                 label = { Text(
