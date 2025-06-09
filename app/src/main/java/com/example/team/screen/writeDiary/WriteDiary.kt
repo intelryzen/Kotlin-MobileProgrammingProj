@@ -273,8 +273,8 @@ fun WriteDiary(
 
                     // 수정된 일기 탭에서만 단어 수집 버튼 표시
                     if (!diary.isOriginal) {
-                                                Button(
-                            onClick = { 
+                        Button(
+                            onClick = {
                                 viewModel.collectVocabularyForSelection(
                                     onSuccess = { items ->
                                         vocabularyItems = items
@@ -296,29 +296,44 @@ fun WriteDiary(
                                 Text("단어 수집")
                             }
                         }
+                        Button(
+                            onClick = {
+                               showPopup = true
+                            },
+                            enabled = !viewModel.isLoading
+                        ) {
+                            if (viewModel.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = Color.White
+                                )
+                            } else {
+                                Text("Q&A")
+                            }
+                        }
                     }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp, bottom = 90.dp)
-                .size(48.dp)
-                .background(Color.DarkGray, shape = CircleShape)
-                .clickable {
-                    showPopup = true
-                },
-            contentAlignment = Alignment.Center
-        )
-        {
-            Text(
-                text = "T",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-        }
+//        Box(
+//            modifier = Modifier
+//                .align(Alignment.BottomEnd)
+//                .padding(16.dp, bottom = 90.dp)
+//                .size(48.dp)
+//                .background(Color.DarkGray, shape = CircleShape)
+//                .clickable {
+//                    showPopup = true
+//                },
+//            contentAlignment = Alignment.Center
+//        )
+//        {
+//            Text(
+//                text = "T",
+//                color = Color.White,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 20.sp
+//            )
+//        }
 
         if (showPopup) {
             QnAPopup(onClose = { showPopup = false })
