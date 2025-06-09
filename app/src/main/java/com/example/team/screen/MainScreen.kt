@@ -1,15 +1,13 @@
-
 package com.example.team.screen
-
 import android.net.Uri
-import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,13 +17,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
@@ -50,7 +52,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DiaryListScreen(onMenuClick:() -> Unit = {},
-                    onDetailClick: (String, String) -> Unit = {_,_ ->},
+                    onDetailClick: (Int) -> Unit = {_ ->},
                     navController: NavController,
                     onCreateNewDiaryClick: () -> Unit = {},
                     viewModel: DiaryViewModel
@@ -60,6 +62,7 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
     val diaryList = viewModel.diaryList
     val expandedStates = remember(diaryList.size) { mutableStateListOf(*List(diaryList.size) {false}.toTypedArray()) }
 
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(16.dp)
             .fillMaxHeight(1f)) {
             // 햄버거 메뉴
@@ -76,12 +79,13 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
 
             // 프로필
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(R.drawable.im2),
-                    contentDescription = "Profile Image",
+                Icon(
+                    imageVector = Icons.Filled.Book,
+                    contentDescription = "Profile Icon",
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(CircleShape)
+                        .clip(CircleShape),
+                    tint = Color.Gray
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
@@ -127,8 +131,7 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
                                     Spacer(modifier = Modifier.weight(1f))
                                     Button(
                                         onClick = {
-                                            viewModel.currentDiaryIndex = index
-                                            onDetailClick(diary.title, diary.content)
+                                            onDetailClick(index)
                                         }
                                     ) {
                                         Text(text = "자세히보기")
@@ -139,16 +142,25 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
                     }
                 }
             }
+        }
 
-            Button(onClick = {
+        // FloatingActionButton for 새 일기
+        FloatingActionButton(
+            onClick = {
                 viewModel.createNewDiary()
-                Toast.makeText(context, "새 일기가 시작되었습니다.", Toast.LENGTH_SHORT).show()
                 onCreateNewDiaryClick()
-            }) {
-                Text("새 일기")
-            }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "새 일기 추가"
+            )
         }
     }
+}
 
 @Composable
 fun MainScreenWithDrawer(
@@ -164,10 +176,10 @@ fun MainScreenWithDrawer(
             DrawerContent(
                 viewModel = viewModel,
                 onDiaryClick = {index ->
-                    val diary = viewModel.diaryList.getOrNull(index) ?: return@DrawerContent
-                    viewModel.currentDiaryIndex = index
-                    scope.launch { drawerState.close() }
-                    navController.navigate("detail/${Uri.encode(diary.title)}/${Uri.encode("Drawer에서 진입한 일기입니다.")}")
+                    scope.launch { 
+                        drawerState.close() 
+                        navController.navigate("detail/$index")
+                    }
                 },
                 onVocabularyClick = {
                     scope.launch { drawerState.close() }
@@ -182,10 +194,8 @@ fun MainScreenWithDrawer(
             onMenuClick = {
                 scope.launch { drawerState.open() }
             },
-            onDetailClick = { title, content ->
-                val encodedTitle = Uri.encode(title)
-                val encodedContent = Uri.encode(content)
-                navController.navigate("detail/$encodedTitle/$encodedContent")
+            onDetailClick = { index ->
+                navController.navigate("detail/$index")
             },
             onCreateNewDiaryClick = {
                 navController.navigate("write")
