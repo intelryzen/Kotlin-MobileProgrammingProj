@@ -183,10 +183,10 @@ fun WriteDiary(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = {
-                        if (isNewDiary) {
-                            // 새 일기 저장
+                if (isNewDiary) {
+                    // 새 일기인 경우 저장 버튼만 표시
+                    Button(
+                        onClick = {
                             viewModel.saveNewDiary(
                                 title = title,
                                 content = content,
@@ -199,39 +199,27 @@ fun WriteDiary(
                                     Toast.makeText(context, error, Toast.LENGTH_LONG).show()
                                 }
                             )
-                        } else {
-                            // 기존 일기 저장
-                            viewModel.saveDiary(
-                                onSuccess = { message ->
-                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                    // 저장 후 수정된 일기 탭으로 자동 전환
-                                    diary?.let { it.isOriginal = false }
-                                },
-                                onError = { error ->
-                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                                }
+                        },
+                        enabled = !viewModel.isLoading
+                    ) {
+                        if (viewModel.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color.White
                             )
+                        } else {
+                            Text("저장")
                         }
-                    },
-                    enabled = !viewModel.isLoading
-                ) {
-                    if (viewModel.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color.White
-                        )
-                    } else {
-                        Text("저장")
                     }
-                }
-                if (!isNewDiary && diary != null) {
+                } else if (diary != null) {
+                    // 기존 일기인 경우 수정, 삭제 버튼만 표시
                     Button(
                         onClick = {
                             viewModel.updateCurrentDiary(
                                 onSuccess = { message ->
                                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                                     // 수정 후 수정된 일기 탭으로 자동 전환
-                                    diary?.let { it.isOriginal = false }
+                                    diary.isOriginal = false
                                 },
                                 onError = { error ->
                                     Toast.makeText(context, error, Toast.LENGTH_LONG).show()
@@ -249,6 +237,7 @@ fun WriteDiary(
                             Text("수정")
                         }
                     }
+                    
                     Button(
                         onClick = {
                             viewModel.deleteCurrentDiary(
@@ -272,15 +261,21 @@ fun WriteDiary(
                             Text("삭제")
                         }
                     }
+                    
+                    // 수정된 일기 탭에서만 단어 수집 버튼 표시
                     if (!diary.isOriginal) {
                         Button(
-                            onClick = { /*단어수집동작 */
+                            onClick = { 
                                 diary.wordCollect = !diary.wordCollect
+                                Toast.makeText(
+                                    context, 
+                                    if (diary.wordCollect) "단어 수집이 활성화되었습니다" else "단어 수집이 비활성화되었습니다", 
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-
                         ) {
                             Text(
-                                "단어 수집"
+                                if (diary.wordCollect) "단어 수집 해제" else "단어 수집"
                             )
                         }
                     }
