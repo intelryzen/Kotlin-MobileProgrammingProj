@@ -41,7 +41,10 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
                 
                 val correctedTexts = mutableListOf<String>()
                 for (i in 0 until dataArray.length()) {
-                    correctedTexts.add(dataArray.getString(i))
+                    val text = dataArray.getString(i)
+                    // 양끝의 큰따옴표 제거
+                    val cleanedText = text.removeSurrounding("\"")
+                    correctedTexts.add(cleanedText)
                 }
                 
                 val apiResponse = DiaryApiResponse(
