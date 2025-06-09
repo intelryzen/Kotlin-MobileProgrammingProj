@@ -87,12 +87,16 @@ fun DrawerScreen(
                 onDiaryClick = { index ->
                     scope.launch { 
                         drawerState.close() 
-                        navController.navigate("detail/$index")
+                    }
+                    navController.navigate("detail/$index") {
+                        launchSingleTop = true
                     }
                 },
                 onVocabularyClick = {
                     scope.launch { drawerState.close() }
-                    navController.navigate("vocabulary")
+                    navController.navigate("vocabulary") {
+                        launchSingleTop = true
+                    }
                 }
             )
         }

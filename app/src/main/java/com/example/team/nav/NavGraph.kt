@@ -16,7 +16,10 @@ fun NavGraph(
     navController: NavHostController,
     diaryViewModel: DiaryViewModel
 ) {
-    NavHost(navController, startDestination = "main") {
+    NavHost(
+        navController = navController, 
+        startDestination = "main"
+    ) {
         composable("main") {
             DiaryListScreen(
                 navController = navController,
@@ -51,6 +54,8 @@ fun NavGraph(
         }
 
         composable("write") {
+            // 새 다이어리 작성 시 인덱스 초기화
+            diaryViewModel.currentDiaryIndex = -1
             WriteDiary(
                 navController = navController,
                 viewModel = diaryViewModel

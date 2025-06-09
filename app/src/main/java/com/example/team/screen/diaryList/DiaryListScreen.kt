@@ -17,10 +17,14 @@ fun DiaryListScreen(
             navController = navController,
             onMenuClick = onMenuClick,
             onDetailClick = { index ->
-                navController.navigate("detail/$index")
+                navController.navigate("detail/$index") {
+                    launchSingleTop = true
+                }
             },
             onCreateNewDiaryClick = {
-                navController.navigate("write")
+                navController.navigate("write") {
+                    launchSingleTop = true
+                }
             }
         )
     }
