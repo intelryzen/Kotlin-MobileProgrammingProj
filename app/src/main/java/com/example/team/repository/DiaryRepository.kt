@@ -17,7 +17,7 @@ import java.util.Locale
 
 class DiaryRepository(private val diaryDao: DiaryDao) {
     
-    private val apiUrl = "https://diary-corrector-473344676717.asia-northeast1.run.app/"
+    private val apiUrl = "https://stable-diffusion.mozilla-4-0-linux.workers.dev/api/aiku/diary-corrector"
     
     suspend fun correctDiary(diaryText: String): Result<DiaryApiResponse> {
         return withContext(Dispatchers.IO) {
@@ -71,6 +71,19 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
                 )
                 diaryDao.insert(diaryEntity)
                 Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+    
+    suspend fun getAllDiaries(): Result<List<DiaryEntity>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                // LiveData를 사용하지 않고 직접 쿼리하는 메서드가 필요함
+                // 일단 기존 메서드를 사용하되, 동기적으로 데이터를 가져오도록 수정 필요
+                val diaries = diaryDao.getAllSync()
+                Result.success(diaries)
             } catch (e: Exception) {
                 Result.failure(e)
             }

@@ -12,13 +12,16 @@ import androidx.room.Update
 interface DiaryDao {
     @Query("SELECT * FROM diary ORDER BY createdDate DESC")
     fun getAll(): LiveData<List<DiaryEntity>>
+    
+    @Query("SELECT * FROM diary ORDER BY createdDate DESC")
+    suspend fun getAllSync(): List<DiaryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(diary: DiaryEntity)
+    suspend fun insert(diary: DiaryEntity)
 
     @Update
-    fun update(diary: DiaryEntity)
+    suspend fun update(diary: DiaryEntity)
 
     @Delete
-    fun delete(diary: DiaryEntity)
+    suspend fun delete(diary: DiaryEntity)
 }
