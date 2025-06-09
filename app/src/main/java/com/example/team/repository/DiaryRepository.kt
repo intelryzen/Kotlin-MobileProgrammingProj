@@ -62,12 +62,13 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
         }
     }
     
-    suspend fun saveDiary(title: String, content: String, correctedContent: String = ""): Result<Unit> {
+    suspend fun saveDiary(title: String, content: String, correctedContent: String = "", createdAt: Date = Date()): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
-                val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val currentDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(createdAt)
+                println("저장할 날짜 문자열: $currentDateTime")
                 val diaryEntity = DiaryEntity(
-                    createdDate = currentDate,
+                    createdDate = currentDateTime,
                     title = title,
                     content = content,
                     correctedContent = correctedContent
@@ -93,7 +94,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
         }
     }
     
-    suspend fun correctAndSaveDiary(title: String, content: String): Result<String> {
+    suspend fun correctAndSaveDiary(title: String, content: String, createdAt: Date = Date()): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
                 // 1. API 호출하여 일기 수정
@@ -107,7 +108,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
                 val correctedContent = apiResponse?.data?.firstOrNull() ?: content
                 
                 // 2. 데이터베이스에 저장
-                val saveResult = saveDiary(title, content, correctedContent)
+                val saveResult = saveDiary(title, content, correctedContent, createdAt)
                 
                 if (saveResult.isFailure) {
                     return@withContext Result.failure(saveResult.exceptionOrNull() ?: Exception("저장 실패"))

@@ -17,34 +17,32 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
     var diaryList = mutableStateListOf<DiaryEntry>()
         private set
     var currentDiaryIndex by mutableStateOf(-1)
-    
-    val currentDiary : DiaryEntry?
+
+    val currentDiary: DiaryEntry?
         get() = diaryList.getOrNull(currentDiaryIndex)
-    
+
     var isLoading by mutableStateOf(false)
         private set
     var errorMessage by mutableStateOf<String?>(null)
         private set
-    
+
     init {
         loadDiariesFromDatabase()
     }
-    
+
     private fun loadDiariesFromDatabase() {
         viewModelScope.launch {
             try {
                 val result = repository.getAllDiaries()
                 if (result.isSuccess) {
                     val diaryEntities = result.getOrNull() ?: emptyList()
+                    val dateTimeFormat =
+                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val diaryEntries = diaryEntities.map { entity ->
                         // DiaryEntity의 createdDate를 Date 객체로 변환
-                        val createdDate = try {
-                            dateFormat.parse(entity.createdDate) ?: Date()
-                        } catch (e: Exception) {
-                            Date() // 파싱 실패 시 현재 시간으로 대체
-                        }
-                        
+                        val createdDate = dateTimeFormat.parse(entity.createdDate)
+
                         DiaryEntry(
                             id = entity.id,
                             title = entity.title,
@@ -64,7 +62,7 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
         }
     }
 
-    fun createNewDiary(){
+    fun createNewDiary() {
         val newDiary = DiaryEntry(
             id = getNextId(),
             createdAt = Date() // 새 일기는 현재 시간으로 설정
@@ -72,34 +70,39 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
         diaryList.add(0, newDiary) // 맨 앞에 추가 (최신순)
         currentDiaryIndex = 0
     }
-    
+
     private fun getNextId(): Int {
         return if (diaryList.isEmpty()) 0 else diaryList.maxOf { it.id } + 1
     }
 
-    fun deleteCurrentDiary(){
-        if(currentDiaryIndex in diaryList.indices){
+    fun deleteCurrentDiary() {
+        if (currentDiaryIndex in diaryList.indices) {
             diaryList.removeAt(currentDiaryIndex)
             currentDiaryIndex = if (diaryList.isNotEmpty()) {
                 if (currentDiaryIndex >= diaryList.size) diaryList.size - 1 else currentDiaryIndex
             } else -1
         }
     }
-    
+
     // 새 일기 저장 (작성 화면에서 사용)
-    fun saveNewDiary(title: String, content: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    fun saveNewDiary(
+        title: String,
+        content: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
         if (title.isBlank() || content.isBlank()) {
             onError("제목과 내용을 모두 입력해주세요.")
             return
         }
-        
+
         isLoading = true
         errorMessage = null
-        
+
         viewModelScope.launch {
             try {
                 val result = repository.correctAndSaveDiary(title, content)
-                
+
                 if (result.isSuccess) {
                     val correctedContent = result.getOrNull() ?: content
                     val newDiary = DiaryEntry(
@@ -111,7 +114,7 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
                     )
                     diaryList.add(0, newDiary) // 맨 앞에 추가 (최신순)
                     currentDiaryIndex = 0
-                    
+
                     onSuccess("일기가 성공적으로 저장되었습니다!")
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "알 수 없는 오류가 발생했습니다."
@@ -127,23 +130,23 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
             }
         }
     }
-    
+
     // 기존 일기 저장 (수정 시 사용)
     fun saveDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val diary = currentDiary ?: return
-        
+
         if (diary.title.isBlank() || diary.content.isBlank()) {
             onError("제목과 내용을 모두 입력해주세요.")
             return
         }
-        
+
         isLoading = true
         errorMessage = null
-        
+
         viewModelScope.launch {
             try {
                 val result = repository.correctAndSaveDiary(diary.title, diary.content)
-                
+
                 if (result.isSuccess) {
                     val correctedContent = result.getOrNull() ?: diary.content
                     diary.editedContent = correctedContent
