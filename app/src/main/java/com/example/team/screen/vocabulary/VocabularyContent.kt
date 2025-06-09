@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -35,31 +37,35 @@ fun VocabularyContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(16.dp)
-                .fillMaxHeight(1f)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .clickable { onMenuClick() }
-                )
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(), 
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Menu",
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .clickable { onMenuClick() }
+                    )
+                }
             }
-            Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            
+            item {
+                Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider()
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider()
-
-            wordList.forEachIndexed { index, vocab ->
-                Spacer(modifier = Modifier.height(12.dp))
-
+            itemsIndexed(wordList) { index, vocab ->
                 Column {
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         "${index + 1}. ${vocab.word}",
                         fontSize = 16.sp,
@@ -76,6 +82,11 @@ fun VocabularyContent(
                     Spacer(modifier = Modifier.height(8.dp))
                     Divider()
                 }
+            }
+            
+            // 하단 여백 (FloatingActionButton과의 겹침 방지)
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
 
