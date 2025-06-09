@@ -1,24 +1,24 @@
 package com.example.team.nav
 
+import DiaryListScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
-import com.example.team.screen.MainScreenWithDrawer
-import com.example.team.screen.vocabulary.VMSWithDrawer
-import com.example.team.screen.writeDiary.WMSWithDrawer
+import com.example.team.screen.vocabulary.VocabularyScreen
+import com.example.team.screen.writeDiary.WriteDiary
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
-fun SeeAppNavGraph(
+fun NavGraph(
     navController: NavHostController,
     diaryViewModel: DiaryViewModel
 ) {
     NavHost(navController, startDestination = "main") {
         composable("main") {
-            MainScreenWithDrawer(
+            DiaryListScreen(
                 navController = navController,
                 viewModel = diaryViewModel
             )
@@ -37,25 +37,21 @@ fun SeeAppNavGraph(
             if (diaryIndex >= 0) {
                 diaryViewModel.currentDiaryIndex = diaryIndex
             }
-            WMSWithDrawer(
-                title = "",
-                content = "",
+            WriteDiary(
                 navController = navController,
                 viewModel = diaryViewModel
             )
         }
 
         composable("vocabulary") {
-            VMSWithDrawer(
+            VocabularyScreen(
                 navController = navController,
                 viewModel = diaryViewModel
             )
         }
 
         composable("write") {
-            WMSWithDrawer(
-                title = "",
-                content = "",
+            WriteDiary(
                 navController = navController,
                 viewModel = diaryViewModel
             )

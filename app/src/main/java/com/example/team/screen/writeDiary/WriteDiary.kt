@@ -43,7 +43,6 @@ import java.util.Locale
 
 @Composable
 fun WriteDiary(
-    onBackClick: () -> Unit = {},
     viewModel: DiaryViewModel,
     navController: NavController
 ) {
@@ -52,7 +51,7 @@ fun WriteDiary(
     val dateTimeFormatter = remember {
         SimpleDateFormat("yyyy년 M월 d일 (HH:mm)", Locale.getDefault())
     }
-    
+
     // 새 일기인지 기존 일기인지 판단하여 적절한 날짜 표시
     val displayDateTime = remember(diary) {
         if (diary != null) {
@@ -61,7 +60,7 @@ fun WriteDiary(
             dateTimeFormatter.format(Date())
         }
     }
-    
+
     val context = LocalContext.current
 
     if (diary == null) {
@@ -84,15 +83,17 @@ fun WriteDiary(
                     contentDescription = "뒤로가기",
                     modifier = Modifier
                         .size(22.dp)
-                        .clickable { onBackClick() }
+                        .clickable {
+                            navController.popBackStack()
+                        }
                 )
-                
+
                 Text(
                     text = displayDateTime,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 // 오른쪽 공간을 맞추기 위한 투명한 스페이서
                 Spacer(modifier = Modifier.size(32.dp))
             }
@@ -226,18 +227,5 @@ fun WriteDiary(
 }
 
 
-@Composable
-fun WMSWithDrawer(
-    title: String,
-    content: String,
-    navController: NavController,
-    viewModel: DiaryViewModel
-) {
-    WriteDiary(
-        onBackClick = {
-            navController.popBackStack()
-        },
-        viewModel = viewModel,
-        navController = navController
-    )
-}
+
+
