@@ -69,7 +69,7 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
     suspend fun saveVocabularyWords(vocabularyItems: List<VocabularyItem>): Result<Int> {
         return withContext(Dispatchers.IO) {
             try {
-                val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val currentDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 val newWords = mutableListOf<VocabEntity>()
                 
                 // 중복 단어 체크하고 새로운 단어만 추가
@@ -82,7 +82,7 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
                                 partOfSpeech = item.partOfSpeech,
                                 meaning = item.meaning,
                                 example = item.exampleSentence,
-                                createdDate = currentDate
+                                createdDate = currentDateTime
                             )
                         )
                     }

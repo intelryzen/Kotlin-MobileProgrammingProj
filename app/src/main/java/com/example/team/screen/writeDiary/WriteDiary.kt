@@ -52,16 +52,16 @@ fun WriteDiary(
     val diary = viewModel.currentDiary
     val isNewDiary = viewModel.currentDiaryIndex == -1
     var showPopup by remember { mutableStateOf(false) }
-    
+
     // 뒤로가기 버튼 연속 클릭 방지
     var isBackButtonEnabled by remember { mutableStateOf(true) }
-    
+
     // 새 일기 작성용 상태 - diary가 변경될 때마다 업데이트
     var title by remember(diary) { mutableStateOf(diary?.title ?: "") }
     var content by remember(diary) { mutableStateOf(diary?.content ?: "") }
     var editedContent by remember(diary) { mutableStateOf(diary?.editedContent ?: "") }
     var isOriginal by remember(diary) { mutableStateOf(diary?.isOriginal ?: true) }
-    
+
     val dateTimeFormatter = remember {
         SimpleDateFormat("yyyy년 M월 d일 (HH:mm)", Locale.getDefault())
     }
@@ -124,7 +124,7 @@ fun WriteDiary(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             if (!isNewDiary && diary != null) {
                 Row {
                     Text(
@@ -134,7 +134,7 @@ fun WriteDiary(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "| 수정된 일기",
+                        text = "| 수정된 일기", fontWeight = FontWeight.Bold,
                         color = if (!diary.isOriginal) Color.Black else Color.Gray,
                         modifier = Modifier.clickable {
                             diary.isOriginal = false
@@ -165,11 +165,13 @@ fun WriteDiary(
                         }
                     }
                 },
-                label = { Text(
-                    if (isNewDiary) "내용" 
-                    else if (diary?.isOriginal == true) "내용" 
-                    else "수정된 내용"
-                ) },
+                label = {
+                    Text(
+                        if (isNewDiary) "내용"
+                        else if (diary?.isOriginal == true) "내용"
+                        else "수정된 내용"
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
@@ -241,7 +243,7 @@ fun WriteDiary(
                             Text("수정")
                         }
                     }
-                    
+
                     Button(
                         onClick = {
                             viewModel.deleteCurrentDiary(
@@ -265,11 +267,11 @@ fun WriteDiary(
                             Text("삭제")
                         }
                     }
-                    
+
                     // 수정된 일기 탭에서만 단어 수집 버튼 표시
                     if (!diary.isOriginal) {
                         Button(
-                            onClick = { 
+                            onClick = {
                                 viewModel.collectVocabularyFromCurrentDiary(
                                     onSuccess = { message ->
                                         diary.wordCollect = true
