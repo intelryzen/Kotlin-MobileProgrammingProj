@@ -75,12 +75,41 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
         return if (diaryList.isEmpty()) 0 else diaryList.maxOf { it.id } + 1
     }
 
-    fun deleteCurrentDiary() {
-        if (currentDiaryIndex in diaryList.indices) {
-            diaryList.removeAt(currentDiaryIndex)
-            currentDiaryIndex = if (diaryList.isNotEmpty()) {
-                if (currentDiaryIndex >= diaryList.size) diaryList.size - 1 else currentDiaryIndex
-            } else -1
+    fun deleteCurrentDiary(onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
+        val diary = currentDiary
+        if (diary == null) {
+            onError("삭제할 일기가 없습니다.")
+            return
+        }
+
+        isLoading = true
+        errorMessage = null
+
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteDiary(diary.id)
+                
+                if (result.isSuccess) {
+                    // 메모리에서도 제거
+                    if (currentDiaryIndex in diaryList.indices) {
+                        diaryList.removeAt(currentDiaryIndex)
+                        currentDiaryIndex = if (diaryList.isNotEmpty()) {
+                            if (currentDiaryIndex >= diaryList.size) diaryList.size - 1 else currentDiaryIndex
+                        } else -1
+                    }
+                    onSuccess("일기가 성공적으로 삭제되었습니다.")
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "삭제 중 오류가 발생했습니다."
+                    errorMessage = error
+                    onError(error)
+                }
+            } catch (e: Exception) {
+                val error = "삭제 중 오류가 발생했습니다: ${e.message}"
+                errorMessage = error
+                onError(error)
+            } finally {
+                isLoading = false
+            }
         }
     }
 

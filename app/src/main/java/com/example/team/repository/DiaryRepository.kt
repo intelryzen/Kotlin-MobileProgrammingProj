@@ -120,4 +120,23 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
             }
         }
     }
+
+    suspend fun deleteDiary(diaryId: Int): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                // ID로 일기를 찾아서 삭제
+                val diaries = diaryDao.getAllSync()
+                val diaryToDelete = diaries.find { it.id == diaryId }
+                
+                if (diaryToDelete != null) {
+                    diaryDao.delete(diaryToDelete)
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("삭제할 일기를 찾을 수 없습니다."))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 } 

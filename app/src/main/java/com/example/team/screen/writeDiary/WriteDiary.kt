@@ -231,13 +231,28 @@ fun WriteDiary(
                     }) {
                         Text("수정")
                     }
-                    Button(onClick = {
-                        /* 일기 삭제 완료*/
-                        viewModel.deleteCurrentDiary()
-                        Toast.makeText(context, "일기 삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack("main", inclusive = false)
-                    }) {
-                        Text("삭제")
+                    Button(
+                        onClick = {
+                            viewModel.deleteCurrentDiary(
+                                onSuccess = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack("main", inclusive = false)
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        },
+                        enabled = !viewModel.isLoading
+                    ) {
+                        if (viewModel.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text("삭제")
+                        }
                     }
                     if (!diary.isOriginal) {
                         Button(
