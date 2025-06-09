@@ -1,3 +1,4 @@
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,18 +23,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.team.model.Vocabulary
-
+import android.net.Uri
 @Composable
 fun VocabularyContent(
     wordList: List<Vocabulary>,
     onMenuClick: () -> Unit = {},
     onHomeClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -73,7 +76,12 @@ fun VocabularyContent(
                             "${index + 1}. ${vocab.word}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
-                            textDecoration = TextDecoration.Underline
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable {
+                                val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                context.startActivity(intent)
+                            }
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text("${vocab.partOfSpeech} ${vocab.meaning}")
