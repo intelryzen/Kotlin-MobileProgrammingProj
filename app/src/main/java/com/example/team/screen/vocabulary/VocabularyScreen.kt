@@ -23,7 +23,12 @@ fun VocabularyScreen(
     ) { onMenuClick ->
         VocabularyContent(
             wordList = sample,
-            onMenuClick = onMenuClick
+            onMenuClick = onMenuClick,
+            onHomeClick = {
+                navController.navigate("main") {
+                    popUpTo("main") { inclusive = true }
+                }
+            }
         )
     }
 }
