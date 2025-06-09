@@ -37,56 +37,60 @@ fun VocabularyContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(), 
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Menu",
-                        modifier = Modifier
-                            .padding(bottom = 8.dp)
-                            .clickable { onMenuClick() }
-                    )
-                }
+            // 고정 헤더
+            Row(
+                modifier = Modifier.fillMaxWidth(), 
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menu",
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .clickable { onMenuClick() }
+                )
             }
             
-            item {
-                Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider()
-            }
-
-            itemsIndexed(wordList) { index, vocab ->
-                Column {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        "${index + 1}. ${vocab.word}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textDecoration = TextDecoration.Underline
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text("${vocab.partOfSpeech} ${vocab.meaning}")
-                    Text(
-                        text = vocab.example,
-                        color = Color.Gray,
-                        fontSize = 13.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
-                }
-            }
+            Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider()
             
-            // 하단 여백 (FloatingActionButton과의 겹침 방지)
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
+            // 스크롤 가능한 단어 목록
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                itemsIndexed(wordList) { index, vocab ->
+                    Column {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            "${index + 1}. ${vocab.word}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textDecoration = TextDecoration.Underline
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("${vocab.partOfSpeech} ${vocab.meaning}")
+                        Text(
+                            text = vocab.example,
+                            color = Color.Gray,
+                            fontSize = 13.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Divider()
+                    }
+                }
+                
+                // 하단 여백 (FloatingActionButton과의 겹침 방지)
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
             }
         }
 

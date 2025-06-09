@@ -185,7 +185,7 @@ fun WriteDiary(
                 },
                 label = {
                     Text(
-                        if (isNewDiary) "내용"
+                        if (isNewDiary) "영어 일기"
                         else if (diary?.isOriginal == true) "내용"
                         else "수정된 내용"
                     )
