@@ -134,15 +134,44 @@ class DiaryViewModel(private val repository: DiaryRepository) : ViewModel() {
 
                 if (result.isSuccess) {
                     val correctedContent = result.getOrNull() ?: content
-                    val newDiary = DiaryEntry(
-                        id = getNextId(),
-                        title = title,
-                        content = content,
-                        editedContent = correctedContent,
-                        createdAt = Date()
-                    )
-                    diaryList.add(0, newDiary) // 맨 앞에 추가 (최신순)
-                    currentDiaryIndex = 0
+                    
+                    // 데이터베이스에서 최신 데이터를 다시 로드하여 동기화
+                    try {
+                        val diariesResult = repository.getAllDiaries()
+                        if (diariesResult.isSuccess) {
+                            val diaryEntities = diariesResult.getOrNull() ?: emptyList()
+                            val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val diaryEntries = diaryEntities.map { entity ->
+                                val createdDate = dateTimeFormat.parse(entity.createdDate)
+                                DiaryEntry(
+                                    id = entity.id,
+                                    title = entity.title,
+                                    content = entity.content,
+                                    editedContent = entity.correctedContent,
+                                    isOriginal = true,
+                                    wordCollect = false,
+                                    createdAt = createdDate
+                                )
+                            }
+                            diaryList.clear()
+                            diaryList.addAll(diaryEntries)
+                            
+                            // 가장 최근에 저장된 일기 (첫 번째)를 현재 일기로 설정
+                            currentDiaryIndex = if (diaryList.isNotEmpty()) 0 else -1
+                        }
+                    } catch (e: Exception) {
+                        // 로드 실패 시 기존 방식으로 처리
+                        val newDiary = DiaryEntry(
+                            id = getNextId(),
+                            title = title,
+                            content = content,
+                            editedContent = correctedContent,
+                            createdAt = Date()
+                        )
+                        diaryList.add(0, newDiary)
+                        currentDiaryIndex = 0
+                    }
 
                     onSuccess("일기가 성공적으로 저장되었습니다!")
                 } else {

@@ -54,11 +54,11 @@ fun WriteDiary(
     // 뒤로가기 버튼 연속 클릭 방지
     var isBackButtonEnabled by remember { mutableStateOf(true) }
     
-    // 새 일기 작성용 상태
-    var title by remember { mutableStateOf(diary?.title ?: "") }
-    var content by remember { mutableStateOf(diary?.content ?: "") }
-    var editedContent by remember { mutableStateOf(diary?.editedContent ?: "") }
-    var isOriginal by remember { mutableStateOf(true) }
+    // 새 일기 작성용 상태 - diary가 변경될 때마다 업데이트
+    var title by remember(diary) { mutableStateOf(diary?.title ?: "") }
+    var content by remember(diary) { mutableStateOf(diary?.content ?: "") }
+    var editedContent by remember(diary) { mutableStateOf(diary?.editedContent ?: "") }
+    var isOriginal by remember(diary) { mutableStateOf(diary?.isOriginal ?: true) }
     
     val dateTimeFormatter = remember {
         SimpleDateFormat("yyyy년 M월 d일 (HH:mm)", Locale.getDefault())
@@ -193,7 +193,9 @@ fun WriteDiary(
                                 onSuccess = { message ->
                                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                                     // 저장 후 수정된 일기 탭으로 자동 전환
-                                    viewModel.currentDiary?.let { it.isOriginal = false }
+                                    viewModel.currentDiary?.let { savedDiary ->
+                                        savedDiary.isOriginal = false
+                                    }
                                 },
                                 onError = { error ->
                                     Toast.makeText(context, error, Toast.LENGTH_LONG).show()
