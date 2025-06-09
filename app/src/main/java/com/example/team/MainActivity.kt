@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.team.nav.SeeAppNavGraph
+import com.example.team.repository.DiaryRepository
 import com.example.team.ui.theme.TeamTheme
 import com.example.team.viewmodel.diary.DiaryViewModel
 
@@ -17,7 +18,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TeamTheme {
-                val diaryViewModel: DiaryViewModel = viewModel()
+                val database = AikuDatabase.getDatabase(this@MainActivity)
+                val repository = DiaryRepository(database.diaryDao())
+                val diaryViewModel: DiaryViewModel = viewModel { DiaryViewModel(repository) }
                 val navController = rememberNavController()
                 SeeAppNavGraph(navController = navController, diaryViewModel = diaryViewModel)
 //                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
