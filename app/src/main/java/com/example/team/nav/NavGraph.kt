@@ -5,10 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.team.screen.MainScreenWithDrawer
 import com.example.team.screen.vocabulary.VMSWithDrawer
 import com.example.team.screen.writeDiary.WMSWithDrawer
-import com.example.team.screen.writeDiary.WriteADiary
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -25,17 +25,21 @@ fun SeeAppNavGraph(
         }
 
         composable(
-            route = "detail/{title}/{content}",
+            route = "detail/{diaryIndex}",
             arguments = listOf(
-                navArgument("title") { defaultValue = "" },
-                navArgument("content") { defaultValue = "" }
+                navArgument("diaryIndex") { 
+                    type = NavType.IntType
+                    defaultValue = -1 
+                }
             )
         ) { backStackEntry ->
-            val title = backStackEntry.arguments?.getString("title") ?: ""
-            val content = backStackEntry.arguments?.getString("content") ?: ""
+            val diaryIndex = backStackEntry.arguments?.getInt("diaryIndex") ?: -1
+            if (diaryIndex >= 0) {
+                diaryViewModel.currentDiaryIndex = diaryIndex
+            }
             WMSWithDrawer(
-                title = title,
-                content = content,
+                title = "",
+                content = "",
                 navController = navController,
                 viewModel = diaryViewModel
             )
@@ -49,7 +53,9 @@ fun SeeAppNavGraph(
         }
 
         composable("write") {
-            WriteADiary(
+            WMSWithDrawer(
+                title = "",
+                content = "",
                 navController = navController,
                 viewModel = diaryViewModel
             )
