@@ -67,7 +67,7 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
+                    contentDescription = "메뉴",
                     modifier = Modifier.padding(bottom = 8.dp)
                         .clickable { onMenuClick() }
 
@@ -85,8 +85,8 @@ fun DiaryListScreen(onMenuClick:() -> Unit = {},
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
-                    Text("Name", fontWeight = FontWeight.Bold)
-                    Text("Description", color = Color.Gray)
+                    Text("AIKU 다이어리", fontWeight = FontWeight.Bold)
+                    Text("AI와 함께하는 영어 다이어리", color = Color.Gray)
                 }
             }
 
