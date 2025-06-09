@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -112,6 +116,17 @@ fun WriteDiary(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // 새 일기 작성일 때만 더미 텍스트 타일 표시
+            if (isNewDiary && title.isEmpty() && content.isEmpty()) {
+                SampleTextTile(
+                    onSampleTextSelected = { sampleTitle, sampleContent ->
+                        title = sampleTitle
+                        content = sampleContent
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             OutlinedTextField(
                 value = if (isNewDiary) title else diary?.title ?: "",
@@ -217,7 +232,7 @@ fun WriteDiary(
                                 color = Color.White
                             )
                         } else {
-                            Text("저장")
+                            Text("AI 교정")
                         }
                     }
                 } else if (diary != null) {
@@ -369,6 +384,50 @@ fun WriteDiary(
     }
 }
 
-
-
+@Composable
+fun SampleTextTile(
+    onSampleTextSelected: (String, String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onSampleTextSelected(
+                    "My School Day",
+                    "Tody is a very good date at school. I waked up early in the morning and eat breakfast with my family."
+                )
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "예시 텍스트",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "처음 사용하시나요?",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "이곳을 클릭하여 예시 일기로 시작해보세요!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
 

@@ -94,40 +94,52 @@ fun QnAPopup(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 100.dp, max = 200.dp)
-                        .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(8.dp))
-                        .padding(12.dp)
-                ) {
-                    Column {
-                        Text(
-                            text = "원본:",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 12.sp,
-                            color = Color.DarkGray
-                        )
+                // 원본 일기
+                Column {
+                    Text(
+                        text = "원본:",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        color = Color.DarkGray
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 80.dp, max = 120.dp)
+                            .background(Color(0xFFF0F0F0), shape = RoundedCornerShape(8.dp))
+                            .padding(12.dp)
+                    ) {
                         Text(
                             text = diary?.content ?: "일기 내용이 없습니다.",
                             fontSize = 14.sp,
-                            color = Color.Black
+                            color = Color.Black,
+                            modifier = Modifier.verticalScroll(rememberScrollState())
                         )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Divider()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "수정됨:",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 12.sp,
-                            color = Color.DarkGray
-                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // 수정된 일기
+                Column {
+                    Text(
+                        text = "수정됨:",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        color = Color.DarkGray
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 80.dp, max = 120.dp)
+                            .background(Color(0xFFE6F3FF), shape = RoundedCornerShape(8.dp))
+                            .padding(12.dp)
+                    ) {
                         Text(
                             text = diary?.editedContent ?: "수정된 내용이 없습니다.",
                             fontSize = 14.sp,
-                            color = Color.Blue
+                            color = Color.Blue,
+                            modifier = Modifier.verticalScroll(rememberScrollState())
                         )
                     }
                 }
@@ -145,7 +157,7 @@ fun QnAPopup(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 100.dp)
+                        .heightIn(min = 100.dp, max = 150.dp)
                         .background(Color(0xFFFCFCFC), shape = RoundedCornerShape(8.dp))
                         .border(1.dp, Color.LightGray, shape = RoundedCornerShape(8.dp))
                         .padding(12.dp)
@@ -160,7 +172,8 @@ fun QnAPopup(
                         Text(
                             text = answer,
                             fontSize = 14.sp,
-                            color = Color.Black
+                            color = Color.Black,
+                            modifier = Modifier.verticalScroll(rememberScrollState())
                         )
                     }
                 }
