@@ -11,7 +11,7 @@ import com.example.team.roomDB.DiaryEntity
 import com.example.team.roomDB.VocabDao
 import com.example.team.roomDB.VocabEntity
 
-@Database(entities = [DiaryEntity::class, VocabEntity::class, ChatEntity::class], version = 4)
+@Database(entities = [DiaryEntity::class, VocabEntity::class, ChatEntity::class], version = 5)
 abstract class AikuDatabase : RoomDatabase() {
     abstract fun diaryDao(): DiaryDao
     abstract fun vocabDao(): VocabDao
