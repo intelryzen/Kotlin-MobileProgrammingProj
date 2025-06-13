@@ -211,7 +211,7 @@ class DiaryViewModel(
                     // 원본 일기는 알아서 수정됨.
                     diary.correctedContent = updatedCorrectedContent
 
-                    onSuccess("일기를 성공적으로 수정하였습니다.")
+                    onSuccess("일기를 수정했습니다.")
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "수정 중 오류가 발생했습니다."
                     errorMessage = error
