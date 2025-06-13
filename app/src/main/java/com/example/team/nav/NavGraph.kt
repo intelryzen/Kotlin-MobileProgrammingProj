@@ -10,7 +10,7 @@ import androidx.navigation.NavType
 import com.example.team.screen.vocabulary.VocabularyScreen
 import com.example.team.screen.writeDiary.WriteDiary
 import com.example.team.viewmodel.diary.DiaryViewModel
-import com.example.team.viewmodel.VocabularyViewModel
+import com.example.team.viewmodel.vocabulary.VocabularyViewModel
 
 @Composable
 fun NavGraph(

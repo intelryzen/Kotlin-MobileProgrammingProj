@@ -48,7 +48,7 @@ fun VocabularyContent(
         ) {
             // 고정 헤더임.
             Row(
-                modifier = Modifier.fillMaxWidth(), 
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Icon(
@@ -59,7 +59,7 @@ fun VocabularyContent(
                         .clickable { onMenuClick() }
                 )
             }
-            
+
             Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Divider()
@@ -73,7 +73,8 @@ fun VocabularyContent(
                 itemsIndexed(wordList) { index, vocab ->
                     Column(
                         modifier = Modifier.clickable {
-                            val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
+                            val url =
+                                "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                             context.startActivity(intent)
                         }
@@ -83,7 +84,12 @@ fun VocabularyContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "${index + 1}. ${vocab.word}",
+                                "${index + 1}. ",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                vocab.word,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 textDecoration = TextDecoration.Underline,
@@ -91,7 +97,7 @@ fun VocabularyContent(
                             Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                             Text(
                                 text = "(${vocab.partOfSpeech})",
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
@@ -105,7 +111,7 @@ fun VocabularyContent(
                         Divider()
                     }
                 }
-                
+
                 // 하단 여백
                 item {
                     Spacer(modifier = Modifier.height(80.dp))

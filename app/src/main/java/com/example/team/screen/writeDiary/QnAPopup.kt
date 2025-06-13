@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.team.ui.theme.LightGreen80
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -70,7 +70,7 @@ fun QnAPopup(
             ) {
                 Text("Q&A", fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                 Text(
-                    "×",
+                    "X",
                     modifier = Modifier
                         .clickable { onClose() }
                         .padding(horizontal = 8.dp),
@@ -80,21 +80,18 @@ fun QnAPopup(
             }
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 스크롤 가능한 내용 영역
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
             ) {
-                // 일기 내용란
                 Text(
                     text = "일기 내용",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                
-                // 원본 일기
+
                 Column {
                     Text(
                         text = "원본:",
@@ -117,13 +114,12 @@ fun QnAPopup(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
-                // 수정된 일기
+
                 Column {
                     Text(
-                        text = "수정됨:",
+                        text = "수정된 내용:",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
                         color = Color.DarkGray
@@ -132,28 +128,26 @@ fun QnAPopup(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 80.dp, max = 120.dp)
-                            .background(Color(0xFFE6F3FF), shape = RoundedCornerShape(8.dp))
+                            .background(LightGreen80, shape = RoundedCornerShape(8.dp))
                             .padding(12.dp)
                     ) {
                         Text(
                             text = diary?.editedContent ?: "수정된 내용이 없습니다.",
                             fontSize = 14.sp,
-                            color = Color.Blue,
+                            color = Color.Black,
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                
-                // 답변 내용
+
                 Text(
                     text = "답변 내용",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,11 +171,10 @@ fun QnAPopup(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // 질문 입력란과 전송 버튼
             OutlinedTextField(
                 value = question,
                 onValueChange = { question = it },
@@ -189,9 +182,9 @@ fun QnAPopup(
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 2
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Button(
                 onClick = {
                     viewModel.askQuestionAboutDiary(
@@ -221,8 +214,8 @@ fun QnAPopup(
     }
 }
 
-    @Preview
-    @Composable
-    private fun QnAPopupPreview() {
-        // QnAPopup(viewModel) {  }
-    }
+@Preview
+@Composable
+private fun QnAPopupPreview() {
+    // QnAPopup(viewModel) {  }
+}

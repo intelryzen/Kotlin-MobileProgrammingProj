@@ -1,8 +1,6 @@
 package com.example.team.screen.writeDiary
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -39,11 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.team.model.VocabularyItem
+import com.example.team.ui.theme.LightGreen80
 import com.example.team.viewmodel.diary.DiaryViewModel
-import com.example.team.viewmodel.VocabularyViewModel
+import com.example.team.viewmodel.vocabulary.VocabularyViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,24 +53,23 @@ fun WriteDiary(
 ) {
     val diary = viewModel.currentDiary
     val isNewDiary = viewModel.currentDiaryIndex == -1
+
     var showPopup by remember { mutableStateOf(false) }
-    var showVocabularySelection by remember { mutableStateOf(false) }
+    var showVocabSelection by remember { mutableStateOf(false) }
     var vocabularyItems by remember { mutableStateOf<List<VocabularyItem>>(emptyList()) }
 
     // 뒤로가기 버튼 연속 클릭 방지
     var isBackButtonEnabled by remember { mutableStateOf(true) }
 
-    // 새 일기 작성용 상태 - diary가 변경될 때마다 업데이트
+    // 새 일기 작성용 상태 => diary가 변경될 때마다 업데이트
     var title by remember(diary) { mutableStateOf(diary?.title ?: "") }
     var content by remember(diary) { mutableStateOf(diary?.content ?: "") }
-    var editedContent by remember(diary) { mutableStateOf(diary?.editedContent ?: "") }
-    var isOriginal by remember(diary) { mutableStateOf(diary?.isOriginal ?: true) }
 
     val dateTimeFormatter = remember {
-        SimpleDateFormat("yyyy년 M월 d일 (HH:mm)", Locale.getDefault())
+        SimpleDateFormat("yyyy년 M월 d일 (HH시 mm분)", Locale.getDefault())
     }
 
-    // 새 일기인지 기존 일기인지 판단하여 적절한 날짜 표시
+    // 새 일기인지 기존 일기인지 판단하여 날짜 표시
     val displayDateTime = remember(diary) {
         if (diary != null) {
             dateTimeFormatter.format(diary.createdAt)
@@ -108,10 +104,8 @@ fun WriteDiary(
                 Text(
                     text = displayDateTime,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold,
                 )
-
-                // 오른쪽 공간을 맞추기 위한 투명한 스페이서
                 Spacer(modifier = Modifier.size(32.dp))
             }
 
@@ -152,7 +146,7 @@ fun WriteDiary(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "| 수정된 일기", fontWeight = FontWeight.Bold,
+                        text = " |  수정된 일기", fontWeight = FontWeight.Bold,
                         color = if (!diary.isOriginal) Color.Black else Color.Gray,
                         modifier = Modifier.clickable {
                             diary.isOriginal = false
@@ -185,7 +179,7 @@ fun WriteDiary(
                 },
                 label = {
                     Text(
-                        if (isNewDiary) "영어 일기"
+                        if (isNewDiary) "영어 일기 내용"
                         else if (diary?.isOriginal == true) "내용"
                         else "수정된 내용"
                     )
@@ -210,7 +204,7 @@ fun WriteDiary(
                         modifier = Modifier.size(20.dp),
                     )
                 } else if (isNewDiary) {
-                    // 새 일기인 경우 저장 버튼만 표시
+                    // 새 일기인 경우 교정 버튼만 표시
                     Button(
                         onClick = {
                             viewModel.saveNewDiary(
@@ -230,9 +224,10 @@ fun WriteDiary(
                         },
                         enabled = !viewModel.isLoading
                     ) {
-                        Text("AI 교정")
+                        Text("AI 교정 및 저장")
                     }
                 } else if (diary != null) {
+
                     // 기존 일기인 경우 수정, 삭제 버튼만 표시
                     Button(
                         onClick = {
@@ -276,7 +271,7 @@ fun WriteDiary(
                                 viewModel.collectVocabularyForSelection(
                                     onSuccess = { items ->
                                         vocabularyItems = items
-                                        showVocabularySelection = true
+                                        showVocabSelection = true
                                     },
                                     onError = { error ->
                                         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
@@ -299,25 +294,6 @@ fun WriteDiary(
                 }
             }
         }
-//        Box(
-//            modifier = Modifier
-//                .align(Alignment.BottomEnd)
-//                .padding(16.dp, bottom = 90.dp)
-//                .size(48.dp)
-//                .background(Color.DarkGray, shape = CircleShape)
-//                .clickable {
-//                    showPopup = true
-//                },
-//            contentAlignment = Alignment.Center
-//        )
-//        {
-//            Text(
-//                text = "T",
-//                color = Color.White,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 20.sp
-//            )
-//        }
 
         if (showPopup) {
             QnAPopup(
@@ -326,8 +302,8 @@ fun WriteDiary(
             )
         }
 
-        if (showVocabularySelection) {
-            VocabularySelectionPopup(
+        if (showVocabSelection) {
+            VocabPopup(
                 vocabularyItems = vocabularyItems,
                 onSaveSelected = { selectedItems ->
                     viewModel.saveSelectedVocabulary(
@@ -335,7 +311,7 @@ fun WriteDiary(
                         onSuccess = { message ->
                             diary?.let { it.wordCollect = true }
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            showVocabularySelection = false
+                            showVocabSelection = false
                         },
                         onError = { error ->
                             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
@@ -346,7 +322,7 @@ fun WriteDiary(
                     )
                 },
                 onDismiss = {
-                    showVocabularySelection = false
+                    showVocabSelection = false
                 }
             )
         }
@@ -367,7 +343,7 @@ fun SampleTextTile(
                 )
             },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+            containerColor = LightGreen80
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -379,7 +355,7 @@ fun SampleTextTile(
         ) {
             Icon(
                 imageVector = Icons.Filled.Edit,
-                contentDescription = "예시 텍스트",
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )

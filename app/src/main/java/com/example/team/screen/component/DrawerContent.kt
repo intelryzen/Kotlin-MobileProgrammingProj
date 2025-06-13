@@ -48,7 +48,7 @@ fun DrawerContent(
                     .clickable { onDiaryClick(index) },
                 colors = CardDefaults.cardColors(
                     containerColor = GreenGrey80,
-                    contentColor = Color.Black 
+                    contentColor = Color.Black
                 ),
                ) {
                 Text(
