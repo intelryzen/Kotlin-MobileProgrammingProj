@@ -1,6 +1,6 @@
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.team.screen.component.DrawerScreen
+import com.example.team.screen.common.DrawerScreen
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable

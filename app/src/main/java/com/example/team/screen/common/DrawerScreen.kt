@@ -1,4 +1,4 @@
-package com.example.team.screen.component
+package com.example.team.screen.common
 import DrawerContent
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
