@@ -276,57 +276,7 @@ class DiaryViewModel(
             }
         }
     }
-
-    // 단어 수집 기능 (선택 없이 모든 단어 저장)
-    fun collectVocabularyFromCurrentDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit, onVocabularyUpdated: (() -> Unit)? = null) {
-        val diary = currentDiary
-        if (diary == null) {
-            onError("일기가 선택되지 않았습니다.")
-            return
-        }
-
-        if (vocabularyRepository == null) {
-            onError("단어 수집 기능을 사용할 수 없습니다.")
-            return
-        }
-
-        val contentToAnalyze = if (!diary.isOriginal && diary.editedContent.isNotEmpty()) {
-            diary.editedContent
-        } else {
-            diary.content
-        }
-
-        if (contentToAnalyze.isBlank()) {
-            onError("분석할 일기 내용이 없습니다.")
-            return
-        }
-
-        isLoading = true
-        errorMessage = null
-
-        viewModelScope.launch {
-            try {
-                val result = vocabularyRepository.collectAndSaveVocabulary(contentToAnalyze)
-
-                if (result.isSuccess) {
-                    val message = result.getOrNull() ?: "단어 수집이 완료되었습니다."
-                    onVocabularyUpdated?.invoke() // VocabularyViewModel 갱신
-                    onSuccess(message)
-                } else {
-                    val error = result.exceptionOrNull()?.message ?: "단어 수집 중 오류가 발생했습니다."
-                    errorMessage = error
-                    onError(error)
-                }
-            } catch (e: Exception) {
-                val error = "단어 수집 중 오류가 발생했습니다: ${e.message}"
-                errorMessage = error
-                onError(error)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
+    
     // 단어 수집만 하고 선택 UI 표시
     fun collectVocabularyForSelection(onSuccess: (List<VocabularyItem>) -> Unit, onError: (String) -> Unit) {
         val diary = currentDiary

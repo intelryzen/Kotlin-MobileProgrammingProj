@@ -47,42 +47,7 @@ class VocabularyViewModel(private val repository: VocabularyRepository) : ViewMo
             }
         }
     }
-    
-    fun collectVocabularyFromDiary(diaryContent: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        if (diaryContent.isBlank()) {
-            onError("일기 내용이 비어있습니다.")
-            return
-        }
-        
-        isLoading = true
-        errorMessage = null
-        
-        viewModelScope.launch {
-            try {
-                val result = repository.collectAndSaveVocabulary(diaryContent)
-                
-                if (result.isSuccess) {
-                    val message = result.getOrNull() ?: "단어 수집이 완료되었습니다."
-                    
-                    // 데이터베이스에서 다시 로드하여 UI 업데이트
-                    loadVocabularyFromDatabase()
-                    
-                    onSuccess(message)
-                } else {
-                    val error = result.exceptionOrNull()?.message ?: "단어 수집 중 오류가 발생했습니다."
-                    errorMessage = error
-                    onError(error)
-                }
-            } catch (e: Exception) {
-                val error = "단어 수집 중 오류가 발생했습니다: ${e.message}"
-                errorMessage = error
-                onError(error)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-    
+
     fun refreshVocabulary() {
         loadVocabularyFromDatabase()
     }

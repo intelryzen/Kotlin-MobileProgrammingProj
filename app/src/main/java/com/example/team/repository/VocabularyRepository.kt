@@ -98,42 +98,6 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
             }
         }
     }
-    
-    suspend fun collectAndSaveVocabulary(diaryContent: String): Result<String> {
-        return withContext(Dispatchers.IO) {
-            try {
-                // 1. API 호출하여 단어 수집
-                val collectionResult = collectVocabulary(diaryContent)
-                
-                if (collectionResult.isFailure) {
-                    return@withContext Result.failure(collectionResult.exceptionOrNull() ?: Exception("단어 수집 API 호출 실패"))
-                }
-                
-                val apiResponse = collectionResult.getOrNull()
-                val vocabularyItems = apiResponse?.data ?: emptyList()
-                
-                // 2. 데이터베이스에 저장
-                val saveResult = saveVocabularyWords(vocabularyItems)
-                
-                if (saveResult.isFailure) {
-                    return@withContext Result.failure(saveResult.exceptionOrNull() ?: Exception("단어 저장 실패"))
-                }
-                
-                val newWordsCount = saveResult.getOrNull() ?: 0
-                val totalWordsCount = vocabularyItems.size
-                
-                val message = if (newWordsCount == 0) {
-                    "모든 단어가 이미 존재합니다."
-                } else {
-                    "총 ${totalWordsCount}개 단어 중 ${newWordsCount}개의 새로운 단어를 추가했습니다."
-                }
-                
-                Result.success(message)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-    }
 
     suspend fun saveSelectedVocabularyWords(selectedItems: List<VocabularyItem>): Result<String> {
         return withContext(Dispatchers.IO) {
