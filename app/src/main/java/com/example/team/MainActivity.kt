@@ -3,9 +3,6 @@ package com.example.team
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.team.nav.NavGraph
@@ -21,23 +18,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             TeamTheme {
                 val database = AikuDatabase.getDatabase(this@MainActivity)
+
+                // 레포지토리들..
                 val diaryRepository = DiaryRepository(database.diaryDao())
-                val vocabularyRepository = VocabularyRepository(database.vocabDao())
                 val chatRepository = ChatRepository()
-                val diaryViewModel: DiaryViewModel = viewModel { 
+                val vocabularyRepository = VocabularyRepository(database.vocabDao())
+
+                // 뷰모델에 레포지토리 주입
+                val diaryViewModel: DiaryViewModel = viewModel {
                     DiaryViewModel(diaryRepository, vocabularyRepository, chatRepository) 
                 }
+
                 val navController = rememberNavController()
                 NavGraph(navController = navController, diaryViewModel = diaryViewModel)
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
