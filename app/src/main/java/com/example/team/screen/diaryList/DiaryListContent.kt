@@ -1,3 +1,4 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,10 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.team.R
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -70,14 +74,13 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
 
             // 프로필
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Book,
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Profile Icon",
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape),
-                    tint = Color.Gray
+                        .size(54.dp)
                 )
+                
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text("AIKU 다이어리", fontWeight = FontWeight.Bold)
