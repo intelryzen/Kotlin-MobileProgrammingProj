@@ -10,7 +10,6 @@ import com.example.team.model.VocabularyItem
 import com.example.team.repository.ChatRepository
 import com.example.team.repository.DiaryRepository
 import com.example.team.repository.VocabularyRepository
-import com.example.team.roomDB.DiaryEntity
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -21,11 +20,11 @@ class DiaryViewModel(
     private val vocabularyRepository: VocabularyRepository? = null,
     private val chatRepository: ChatRepository? = null
 ) : ViewModel() {
-    var diaryList = mutableStateListOf<DiaryEntry>()
+    var diaryList = mutableStateListOf<DiaryViewState>()
         private set
     var currentDiaryIndex by mutableStateOf(-1)
 
-    val currentDiary: DiaryEntry?
+    val currentDiary: DiaryViewState?
         get() = diaryList.getOrNull(currentDiaryIndex)
 
     var isLoading by mutableStateOf(false)
@@ -34,10 +33,10 @@ class DiaryViewModel(
         private set
 
     init {
-        loadDiariesFromDatabase()
+        loadDiariesFromDB()
     }
 
-    private fun loadDiariesFromDatabase() {
+    private fun loadDiariesFromDB() {
         viewModelScope.launch {
             try {
                 val result = repository.getAllDiaries()
@@ -45,37 +44,27 @@ class DiaryViewModel(
                     val diaryEntities = result.getOrNull() ?: emptyList()
                     val dateTimeFormat =
                         SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val diaryEntries = diaryEntities.map { entity ->
+                    val diaryStates = diaryEntities.map { entity ->
                         // DiaryEntity의 createdDate를 Date 객체로 변환
                         val createdDate = dateTimeFormat.parse(entity.createdDate)
 
-                        DiaryEntry(
+                        DiaryViewState(
                             id = entity.id,
                             title = entity.title,
                             content = entity.content,
-                            editedContent = entity.correctedContent,
+                            correctedContent = entity.correctedContent,
                             isOriginal = true,
                             wordCollect = false,
-                            createdAt = createdDate
+                            createdAt = createdDate!!
                         )
                     }
                     diaryList.clear()
-                    diaryList.addAll(diaryEntries)
+                    diaryList.addAll(diaryStates)
                 }
             } catch (e: Exception) {
                 errorMessage = "일기 목록을 불러오는 중 오류가 발생했습니다: ${e.message}"
             }
         }
-    }
-
-    fun createNewDiary() {
-        val newDiary = DiaryEntry(
-            id = getNextId(),
-            createdAt = Date() // 새 일기는 현재 시간으로 설정
-        )
-        diaryList.add(0, newDiary) // 맨 앞에 추가 (최신순)
-        currentDiaryIndex = 0
     }
 
     private fun getNextId(): Int {
@@ -95,7 +84,7 @@ class DiaryViewModel(
         viewModelScope.launch {
             try {
                 val result = repository.deleteDiary(diary.id)
-                
+
                 if (result.isSuccess) {
                     // 메모리에서도 제거
                     if (currentDiaryIndex in diaryList.indices) {
@@ -104,7 +93,7 @@ class DiaryViewModel(
                             if (currentDiaryIndex >= diaryList.size) diaryList.size - 1 else currentDiaryIndex
                         } else -1
                     }
-                    onSuccess("일기가 성공적으로 삭제되었습니다.")
+                    onSuccess("일기를 삭제했습니다.")
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "삭제 중 오류가 발생했습니다."
                     errorMessage = error
@@ -120,7 +109,7 @@ class DiaryViewModel(
         }
     }
 
-    // 새 일기 저장 (작성 화면에서 사용)
+    // 새 일기 저장
     fun saveNewDiary(
         title: String,
         content: String,
@@ -141,81 +130,46 @@ class DiaryViewModel(
 
                 if (result.isSuccess) {
                     val correctedContent = result.getOrNull() ?: content
-                    
+
                     // 데이터베이스에서 최신 데이터를 다시 로드하여 동기화
                     try {
                         val diariesResult = repository.getAllDiaries()
                         if (diariesResult.isSuccess) {
                             val diaryEntities = diariesResult.getOrNull() ?: emptyList()
-                            val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val dateTimeFormat =
+                                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                             val diaryEntries = diaryEntities.map { entity ->
                                 val createdDate = dateTimeFormat.parse(entity.createdDate)
-                                DiaryEntry(
+                                DiaryViewState(
                                     id = entity.id,
                                     title = entity.title,
                                     content = entity.content,
-                                    editedContent = entity.correctedContent,
+                                    correctedContent = entity.correctedContent,
                                     isOriginal = true,
                                     wordCollect = false,
-                                    createdAt = createdDate
+                                    createdAt = createdDate!!
                                 )
                             }
                             diaryList.clear()
                             diaryList.addAll(diaryEntries)
-                            
-                            // 가장 최근에 저장된 일기 (첫 번째)를 현재 일기로 설정
+
+                            // 가장 최근에 저장된 일기(첫 번째)를 현재 일기로 설정
                             currentDiaryIndex = if (diaryList.isNotEmpty()) 0 else -1
                         }
                     } catch (e: Exception) {
-                        // 로드 실패 시 기존 방식으로 처리
-                        val newDiary = DiaryEntry(
+                        // 로드 실패 시 기존 방식으로 처리해야
+                        val newDiary = DiaryViewState(
                             id = getNextId(),
                             title = title,
                             content = content,
-                            editedContent = correctedContent,
+                            correctedContent = correctedContent,
                             createdAt = Date()
                         )
                         diaryList.add(0, newDiary)
                         currentDiaryIndex = 0
                     }
 
-                    onSuccess("일기가 성공적으로 저장되었습니다!")
-                } else {
-                    val error = result.exceptionOrNull()?.message ?: "알 수 없는 오류가 발생했습니다."
-                    errorMessage = error
-                    onError(error)
-                }
-            } catch (e: Exception) {
-                val error = "저장 중 오류가 발생했습니다: ${e.message}"
-                errorMessage = error
-                onError(error)
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    // 기존 일기 저장 (수정 시 사용)
-    fun saveDiary(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        val diary = currentDiary ?: return
-
-        if (diary.title.isBlank() || diary.content.isBlank()) {
-            onError("제목과 내용을 모두 입력해주세요.")
-            return
-        }
-
-        isLoading = true
-        errorMessage = null
-
-        viewModelScope.launch {
-            try {
-                val result = repository.correctAndSaveDiary(diary.title, diary.content)
-
-                if (result.isSuccess) {
-                    val correctedContent = result.getOrNull() ?: diary.content
-                    diary.editedContent = correctedContent
-                    onSuccess("일기가 성공적으로 저장되었습니다!")
+                    onSuccess("일기를 교정하고 저장하였습니다.")
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "알 수 없는 오류가 발생했습니다."
                     errorMessage = error
@@ -253,15 +207,15 @@ class DiaryViewModel(
                     diaryId = diary.id,
                     title = diary.title,
                     content = diary.content,
-                    correctedContent = diary.editedContent.takeIf { it.isNotEmpty() }
                 )
 
                 if (result.isSuccess) {
-                    val updatedCorrectedContent = result.getOrNull() ?: diary.editedContent
-                    // 메모리의 일기도 업데이트
-                    diary.editedContent = updatedCorrectedContent
-                    
-                    onSuccess("일기가 성공적으로 수정되었습니다!")
+                    val updatedCorrectedContent = result.getOrNull() ?: diary.correctedContent
+
+                    // 원본 일기는 알아서 수정됨.
+                    diary.correctedContent = updatedCorrectedContent
+
+                    onSuccess("일기를 성공적으로 수정하였습니다.")
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "수정 중 오류가 발생했습니다."
                     errorMessage = error
@@ -276,28 +230,23 @@ class DiaryViewModel(
             }
         }
     }
-    
-    // 단어 수집만 하고 선택 UI 표시
-    fun collectVocabularyForSelection(onSuccess: (List<VocabularyItem>) -> Unit, onError: (String) -> Unit) {
+
+    // 단어 수집만 하고 선택 팝엎만 표시됨
+    fun collectVocabularies(onSuccess: (List<VocabularyItem>) -> Unit, onError: (String) -> Unit) {
         val diary = currentDiary
         if (diary == null) {
             onError("일기가 선택되지 않았습니다.")
             return
         }
 
-        if (vocabularyRepository == null) {
-            onError("단어 수집 기능을 사용할 수 없습니다.")
-            return
-        }
-
-        val contentToAnalyze = if (!diary.isOriginal && diary.editedContent.isNotEmpty()) {
-            diary.editedContent
+        val contentToCorrect = if (!diary.isOriginal && diary.correctedContent.isNotEmpty()) {
+            diary.correctedContent
         } else {
             diary.content
         }
 
-        if (contentToAnalyze.isBlank()) {
-            onError("분석할 일기 내용이 없습니다.")
+        if (contentToCorrect.isBlank()) {
+            onError("교정할 일기 내용이 없습니다.")
             return
         }
 
@@ -306,7 +255,7 @@ class DiaryViewModel(
 
         viewModelScope.launch {
             try {
-                val result = vocabularyRepository.collectVocabulary(contentToAnalyze)
+                val result = vocabularyRepository!!.collectVocabulary(contentToCorrect)
 
                 if (result.isSuccess) {
                     val apiResponse = result.getOrNull()
@@ -328,14 +277,14 @@ class DiaryViewModel(
     }
 
     // 선택된 단어들만 저장
-    fun saveSelectedVocabulary(selectedItems: List<VocabularyItem>, onSuccess: (String) -> Unit, onError: (String) -> Unit, onVocabularyUpdated: (() -> Unit)? = null) {
-        if (vocabularyRepository == null) {
-            onError("단어 저장 기능을 사용할 수 없습니다.")
-            return
-        }
-
+    fun saveSelectedVocabulary(
+        selectedItems: List<VocabularyItem>,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit,
+        onVocabularyUpdated: (() -> Unit)? = null
+    ) {
         if (selectedItems.isEmpty()) {
-            onError("선택된 단어가 없습니다.")
+            onError("선택한 단어가 없습니다.")
             return
         }
 
@@ -344,11 +293,12 @@ class DiaryViewModel(
 
         viewModelScope.launch {
             try {
-                val result = vocabularyRepository.saveSelectedVocabularyWords(selectedItems)
+                val result = vocabularyRepository!!.saveSelectedVocabularyWords(selectedItems)
 
                 if (result.isSuccess) {
                     val message = result.getOrNull() ?: "선택한 단어들이 저장되었습니다."
-                    onVocabularyUpdated?.invoke() // VocabularyViewModel 갱신
+                    // 반드시 단어 뷰모델 갱신해줘야 함.
+                    onVocabularyUpdated?.invoke()
                     onSuccess(message)
                 } else {
                     val error = result.exceptionOrNull()?.message ?: "단어 저장 중 오류가 발생했습니다."
@@ -365,16 +315,15 @@ class DiaryViewModel(
         }
     }
 
-    // Q&A 기능
-    fun askQuestionAboutDiary(question: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    // Q&A
+    fun askQuestion(
+        question: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
         val diary = currentDiary
         if (diary == null) {
             onError("일기가 선택되지 않았습니다.")
-            return
-        }
-
-        if (chatRepository == null) {
-            onError("Q&A 기능을 사용할 수 없습니다.")
             return
         }
 
@@ -384,7 +333,7 @@ class DiaryViewModel(
         }
 
         val userDiary = diary.content
-        val gptDiary = diary.editedContent
+        val gptDiary = diary.correctedContent
 
         if (userDiary.isBlank()) {
             onError("원본 일기 내용이 없습니다.")
@@ -392,7 +341,7 @@ class DiaryViewModel(
         }
 
         if (gptDiary.isBlank()) {
-            onError("수정된 일기 내용이 없습니다.")
+            onError("교정된 일기 내용이 없습니다.")
             return
         }
 
@@ -401,19 +350,19 @@ class DiaryViewModel(
 
         viewModelScope.launch {
             try {
-                val result = chatRepository.askQuestion(userDiary, gptDiary, question)
+                val result = chatRepository!!.askQuestion(userDiary, gptDiary, question)
 
                 if (result.isSuccess) {
                     val apiResponse = result.getOrNull()
-                    val answer = apiResponse?.data?.firstOrNull() ?: "답변을 받을 수 없습니다."
+                    val answer = apiResponse?.data?.firstOrNull() ?: "답변이 없습니다."
                     onSuccess(answer)
                 } else {
-                    val error = result.exceptionOrNull()?.message ?: "질문 처리 중 오류가 발생했습니다."
+                    val error = result.exceptionOrNull()?.message ?: "답변 중 오류가 발생했습니다."
                     errorMessage = error
                     onError(error)
                 }
             } catch (e: Exception) {
-                val error = "질문 처리 중 오류가 발생했습니다: ${e.message}"
+                val error = "답변 중 오류가 발생했습니다: ${e.message}"
                 errorMessage = error
                 onError(error)
             } finally {

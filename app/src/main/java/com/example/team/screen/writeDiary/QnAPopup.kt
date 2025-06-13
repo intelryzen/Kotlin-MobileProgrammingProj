@@ -132,7 +132,7 @@ fun QnAPopup(
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = diary?.editedContent ?: "수정된 내용이 없습니다.",
+                            text = diary?.correctedContent ?: "수정된 내용이 없습니다.",
                             fontSize = 14.sp,
                             color = Color.Black,
                             modifier = Modifier.verticalScroll(rememberScrollState())
@@ -187,7 +187,7 @@ fun QnAPopup(
 
             Button(
                 onClick = {
-                    viewModel.askQuestionAboutDiary(
+                    viewModel.askQuestion(
                         question = question,
                         onSuccess = { response ->
                             answer = response

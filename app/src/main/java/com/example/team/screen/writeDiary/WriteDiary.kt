@@ -162,7 +162,7 @@ fun WriteDiary(
                 } else if (diary?.isOriginal == true) {
                     diary.content
                 } else {
-                    diary?.editedContent ?: ""
+                    diary?.correctedContent ?: ""
                 },
                 onValueChange = { newValue ->
                     if (isNewDiary) {
@@ -172,7 +172,7 @@ fun WriteDiary(
                             if (currentDiary.isOriginal) {
                                 currentDiary.content = newValue
                             } else {
-                                currentDiary.editedContent = newValue
+                                currentDiary.correctedContent = newValue
                             }
                         }
                     }
@@ -268,7 +268,7 @@ fun WriteDiary(
                     if (!diary.isOriginal) {
                         Button(
                             onClick = {
-                                viewModel.collectVocabularyForSelection(
+                                viewModel.collectVocabularies(
                                     onSuccess = { items ->
                                         vocabularyItems = items
                                         showVocabSelection = true

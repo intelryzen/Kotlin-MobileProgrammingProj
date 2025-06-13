@@ -156,7 +156,6 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
         diaryId: Int,
         title: String,
         content: String,
-        correctedContent: String? = null
     ): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
