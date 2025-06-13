@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.team.model.VocabularyItem
 import android.net.Uri
+
 @Composable
 fun VocabularyContent(
     wordList: List<VocabularyItem>,
@@ -36,6 +37,7 @@ fun VocabularyContent(
     onHomeClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -44,14 +46,14 @@ fun VocabularyContent(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // 고정 헤더
+            // 고정 헤더임.
             Row(
                 modifier = Modifier.fillMaxWidth(), 
                 horizontalArrangement = Arrangement.Start
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
-                    contentDescription = "Menu",
+                    contentDescription = null,
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .clickable { onMenuClick() }
@@ -61,8 +63,8 @@ fun VocabularyContent(
             Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Divider()
-            
-            // 스크롤 가능한 단어 목록
+            Spacer(modifier = Modifier.height(8.dp))
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -77,14 +79,23 @@ fun VocabularyContent(
                         }
                     ) {
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "${index + 1}. ${vocab.word}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textDecoration = TextDecoration.Underline,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "${index + 1}. ${vocab.word}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                textDecoration = TextDecoration.Underline,
+                            )
+                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            Text(
+                                text = "(${vocab.partOfSpeech})",
+                                fontSize = 16.sp,
+                            )
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("${vocab.partOfSpeech} ${vocab.meaning}")
+                        Text(vocab.meaning)
                         Text(
                             text = vocab.example,
                             color = Color.Gray,
@@ -95,14 +106,14 @@ fun VocabularyContent(
                     }
                 }
                 
-                // 하단 여백 (FloatingActionButton과의 겹침 방지)
+                // 하단 여백
                 item {
                     Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
 
-        // 홈화면으로 가는 FloatingActionButton
+        // 홈화면 액션 버튼
         FloatingActionButton(
             onClick = onHomeClick,
             modifier = Modifier
@@ -111,7 +122,7 @@ fun VocabularyContent(
         ) {
             Icon(
                 imageVector = Icons.Filled.Home,
-                contentDescription = "홈화면으로 이동"
+                contentDescription = null
             )
         }
     }

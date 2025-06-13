@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.team.ui.theme.GreenGrey80
+import com.example.team.ui.theme.background
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -33,7 +35,7 @@ fun DrawerContent(
     Column(
         modifier = Modifier
             .width(300.dp)
-            .background(Color.LightGray)
+            .background(background)
             .padding(16.dp)
             .fillMaxHeight(1f)
     ) {
@@ -44,8 +46,11 @@ fun DrawerContent(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable { onDiaryClick(index) },
-                elevation = CardDefaults.cardElevation(2.dp)
-            ) {
+                colors = CardDefaults.cardColors(
+                    containerColor = GreenGrey80,
+                    contentColor = Color.Black 
+                ),
+               ) {
                 Text(
                     text = diary.title.ifBlank { "제목 없음" },
                     fontWeight = FontWeight.Bold,
@@ -57,6 +62,10 @@ fun DrawerContent(
         Divider(modifier = Modifier.padding(vertical = 12.dp))
 
         Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White,
+                contentColor = Color.Black,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onVocabularyClick() },

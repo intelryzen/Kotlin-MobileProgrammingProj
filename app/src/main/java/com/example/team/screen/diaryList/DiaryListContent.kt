@@ -40,6 +40,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.team.R
+import com.example.team.ui.theme.Green80
+import com.example.team.ui.theme.GreenGrey80
+import com.example.team.ui.theme.LightGreen40
+import com.example.team.ui.theme.LightGreen80
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -96,6 +100,10 @@ fun DiaryListContent(
             LazyColumn {
                 itemsIndexed(diaryList) { index, diary ->
                     Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = GreenGrey80,
+                            contentColor = Color.Black
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),

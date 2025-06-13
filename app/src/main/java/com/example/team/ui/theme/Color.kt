@@ -2,6 +2,7 @@ package com.example.team.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val background = Color(0xfff5f3f2)
 val Green80 = Color(0xFF81C784)
 val GreenGrey80 = Color(0xFFA5D6A7)
 val LightGreen80 = Color(0xFFC8E6C9)
