@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// 단어장 레포
 class VocabularyRepository(private val vocabDao: VocabDao) {
     
     private val apiUrl = "https://vocabulary-473344676717.asia-northeast1.run.app"
@@ -112,11 +113,11 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
                 val totalWordsCount = selectedItems.size
                 
                 val message = if (newWordsCount == 0) {
-                    "선택한 모든 단어가 이미 존재합니다."
+                    "선택한 모든 단어가 이미 단어장에 존재합니다."
                 } else if (newWordsCount == totalWordsCount) {
-                    "${newWordsCount}개의 새로운 단어를 추가했습니다."
+                    "${newWordsCount}개의 새로운 단어를 단어장에 추가했습니다."
                 } else {
-                    "선택한 ${totalWordsCount}개 단어 중 ${newWordsCount}개의 새로운 단어를 추가했습니다."
+                    "선택한 ${totalWordsCount}개 단어 중 ${newWordsCount}개의 새로운 단어를 단어장에 추가했습니다."
                 }
                 
                 Result.success(message)
