@@ -1,15 +1,9 @@
-package com.example.team
+package com.example.team.roomDB
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.team.roomDB.ChatDao
-import com.example.team.roomDB.ChatEntity
-import com.example.team.roomDB.DiaryDao
-import com.example.team.roomDB.DiaryEntity
-import com.example.team.roomDB.VocabDao
-import com.example.team.roomDB.VocabEntity
 
 @Database(entities = [DiaryEntity::class, VocabEntity::class, ChatEntity::class], version = 4)
 abstract class AikuDatabase : RoomDatabase() {

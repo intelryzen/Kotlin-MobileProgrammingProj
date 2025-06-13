@@ -13,6 +13,7 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.SET_NULL
     )]
 )
+
 data class ChatEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val diaryId: Int?,

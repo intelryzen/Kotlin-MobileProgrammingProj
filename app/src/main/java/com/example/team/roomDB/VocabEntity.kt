@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class VocabEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val word: String,
-    val partOfSpeech: String,      // 예: noun, verb 등
+    val partOfSpeech: String,      // 예: 명사, 동사 등
     val meaning: String,           // 한국어 뜻
     val example: String,
     val createdDate: String        // 예: "2025-06-05"

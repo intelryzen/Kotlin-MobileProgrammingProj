@@ -89,7 +89,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
     suspend fun getAllDiaries(): Result<List<DiaryEntity>> {
         return withContext(Dispatchers.IO) {
             try {
-                val diaries = diaryDao.getAllSync()
+                val diaries = diaryDao.getAll()
                 Result.success(diaries)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -137,7 +137,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
         return withContext(Dispatchers.IO) {
             try {
                 // ID로 일기를 찾아서 삭제
-                val diaries = diaryDao.getAllSync()
+                val diaries = diaryDao.getAll()
                 val diaryToDelete = diaries.find { it.id == diaryId }
 
                 if (diaryToDelete != null) {
@@ -161,7 +161,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
         return withContext(Dispatchers.IO) {
             try {
                 // ID로 일기를 찾기
-                val diaries = diaryDao.getAllSync()
+                val diaries = diaryDao.getAll()
                 val diaryToUpdate = diaries.find { it.id == diaryId }
 
                 if (diaryToUpdate == null) {

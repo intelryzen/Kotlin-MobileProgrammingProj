@@ -9,6 +9,7 @@ import com.example.team.nav.NavGraph
 import com.example.team.repository.ChatRepository
 import com.example.team.repository.DiaryRepository
 import com.example.team.repository.VocabularyRepository
+import com.example.team.roomDB.AikuDatabase
 import com.example.team.ui.theme.TeamTheme
 import com.example.team.viewmodel.diary.DiaryViewModel
 import com.example.team.viewmodel.VocabularyViewModel

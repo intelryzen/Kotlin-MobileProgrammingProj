@@ -130,7 +130,7 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
     suspend fun getAllVocabulary(): Result<List<VocabEntity>> {
         return withContext(Dispatchers.IO) {
             try {
-                val vocabularies = vocabDao.getAllSync()
+                val vocabularies = vocabDao.getAll()
                 Result.success(vocabularies)
             } catch (e: Exception) {
                 Result.failure(e)

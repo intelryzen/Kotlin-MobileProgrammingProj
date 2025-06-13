@@ -1,6 +1,5 @@
 package com.example.team.roomDB
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -11,10 +10,7 @@ import androidx.room.Update
 @Dao
 interface VocabDao {
     @Query("SELECT * FROM vocab ORDER BY id DESC")
-    fun getAllSortedByDate(): LiveData<List<VocabEntity>>
-
-    @Query("SELECT * FROM vocab ORDER BY id DESC")
-    suspend fun getAllSync(): List<VocabEntity>
+    suspend fun getAll(): List<VocabEntity>
 
     @Query("SELECT EXISTS(SELECT 1 FROM vocab WHERE word = :word LIMIT 1)")
     suspend fun isWordExists(word: String): Boolean
