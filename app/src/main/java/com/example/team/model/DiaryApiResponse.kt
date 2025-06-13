@@ -1,11 +1,11 @@
 package com.example.team.model
 
 data class DiaryApiResponse(
-    val meta: Meta,
+    val meta: DiaryMeta,
     val data: List<String>
 )
 
-data class Meta(
+data class DiaryMeta(
     val status: Int,
     val message: String
 )

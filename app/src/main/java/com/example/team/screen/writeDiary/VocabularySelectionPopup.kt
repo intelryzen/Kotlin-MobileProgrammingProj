@@ -158,7 +158,7 @@ private fun VocabularyItemRow(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = item.exampleSentence,
+                    text = item.example,
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

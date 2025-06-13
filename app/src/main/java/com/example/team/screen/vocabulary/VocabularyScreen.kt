@@ -3,7 +3,6 @@ package com.example.team.screen.vocabulary
 import VocabularyContent
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.team.model.Vocabulary
 import com.example.team.screen.component.DrawerScreen
 import com.example.team.viewmodel.diary.DiaryViewModel
 import com.example.team.viewmodel.VocabularyViewModel

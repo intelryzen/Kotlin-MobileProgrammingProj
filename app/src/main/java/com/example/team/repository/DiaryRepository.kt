@@ -3,7 +3,7 @@
 package com.example.team.repository
 
 import com.example.team.model.DiaryApiResponse
-import com.example.team.model.Meta
+import com.example.team.model.DiaryMeta
 import com.example.team.roomDB.DiaryDao
 import com.example.team.roomDB.DiaryEntity
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +48,7 @@ class DiaryRepository(private val diaryDao: DiaryDao) {
                 }
                 
                 val apiResponse = DiaryApiResponse(
-                    meta = Meta(
+                    meta = DiaryMeta(
                         status = meta.getInt("status"),
                         message = meta.getString("message")
                     ),

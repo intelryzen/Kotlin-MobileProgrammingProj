@@ -6,14 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.team.model.Vocabulary
+import com.example.team.model.VocabularyItem
 import com.example.team.repository.VocabularyRepository
-import com.example.team.roomDB.VocabEntity
 import kotlinx.coroutines.launch
 
 class VocabularyViewModel(private val repository: VocabularyRepository) : ViewModel() {
     
-    var vocabularyList = mutableStateListOf<Vocabulary>()
+    var vocabularyList = mutableStateListOf<VocabularyItem>()
         private set
     
     var isLoading by mutableStateOf(false)
@@ -33,7 +32,7 @@ class VocabularyViewModel(private val repository: VocabularyRepository) : ViewMo
                 if (result.isSuccess) {
                     val vocabEntities = result.getOrNull() ?: emptyList()
                     val vocabularies = vocabEntities.map { entity ->
-                        Vocabulary(
+                        VocabularyItem(
                             word = entity.word,
                             partOfSpeech = entity.partOfSpeech,
                             meaning = entity.meaning,

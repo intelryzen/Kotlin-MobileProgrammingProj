@@ -46,7 +46,7 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
                             word = item.getString("word"),
                             partOfSpeech = item.getString("partOfSpeech"),
                             meaning = item.getString("meaning"),
-                            exampleSentence = item.getString("exampleSentence")
+                            example = item.getString("exampleSentence")
                         )
                     )
                 }
@@ -81,7 +81,7 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
                                 word = item.word,
                                 partOfSpeech = item.partOfSpeech,
                                 meaning = item.meaning,
-                                example = item.exampleSentence,
+                                example = item.example,
                                 createdDate = currentDateTime
                             )
                         )
