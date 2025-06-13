@@ -17,7 +17,7 @@ import com.example.team.roomDB.AikuDatabase
 import com.example.team.ui.theme.TeamTheme
 import com.example.team.ui.theme.background
 import com.example.team.viewmodel.diary.DiaryViewModel
-import com.example.team.viewmodel.VocabularyViewModel
+import com.example.team.viewmodel.vocabulary.VocabularyViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

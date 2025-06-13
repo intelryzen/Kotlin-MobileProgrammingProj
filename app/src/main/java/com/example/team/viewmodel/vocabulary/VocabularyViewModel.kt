@@ -1,4 +1,4 @@
-package com.example.team.viewmodel
+package com.example.team.viewmodel.vocabulary
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf

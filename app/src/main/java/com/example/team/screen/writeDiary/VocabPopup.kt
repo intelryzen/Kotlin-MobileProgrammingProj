@@ -1,6 +1,5 @@
 package com.example.team.screen.writeDiary
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,9 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.team.model.VocabularyItem
+import com.example.team.ui.theme.GreenGrey80
+import com.example.team.ui.theme.LightGreen80
 
 @Composable
-fun VocabularySelectionPopup(
+fun VocabPopup(
     vocabularyItems: List<VocabularyItem>,
     onSaveSelected: (List<VocabularyItem>) -> Unit,
     onDismiss: () -> Unit
@@ -33,12 +34,11 @@ fun VocabularySelectionPopup(
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f),
             shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface
+            color = Color.White
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                // 헤더
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -52,6 +52,7 @@ fun VocabularySelectionPopup(
                     
                     Row {
                         TextButton(onClick = {
+                            // (참고) 각 요소를 키로 하고, 람다 식의 결과를 값으로 하는 Map을 만들어주는 메소드
                             selectedItems = vocabularyItems.associateWith { true }
                         }) {
                             Text("전체 선택")
@@ -73,7 +74,7 @@ fun VocabularySelectionPopup(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(vocabularyItems) { item ->
-                        VocabularyItemRow(
+                        VocabularyCard(
                             item = item,
                             isSelected = selectedItems[item] ?: false,
                             onSelectionChanged = { isSelected ->
@@ -96,7 +97,8 @@ fun VocabularySelectionPopup(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
+                            containerColor = Color.White,
+                            contentColor = Color.Black
                         )
                     ) {
                         Text("취소")
@@ -119,14 +121,17 @@ fun VocabularySelectionPopup(
 }
 
 @Composable
-private fun VocabularyItemRow(
+private fun VocabularyCard(
     item: VocabularyItem,
     isSelected: Boolean,
     onSelectionChanged: (Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = LightGreen80,
+            contentColor = Color.Black
+        ),
     ) {
         Row(
             modifier = Modifier
@@ -141,26 +146,31 @@ private fun VocabularyItemRow(
             )
             
             Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = item.word,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    Text(
+                        text = "(${item.partOfSpeech})",
+                        fontSize = 14.sp,
+                    )
+                }
+
                 Text(
-                    text = item.word,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textDecoration = TextDecoration.Underline
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = "${item.partOfSpeech} ${item.meaning}",
+                    text = item.meaning,
                     fontSize = 14.sp
                 )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Text(
                     text = item.example,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = Color.Black
                 )
             }
         }
