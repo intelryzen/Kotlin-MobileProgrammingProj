@@ -8,6 +8,8 @@ import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 
+// chat api 레포
+// 로컬DB에 따로 저장하지 않으므로 dao 주입 필요없음
 class ChatRepository {
     
     private val apiUrl = "https://chat-473344676717.asia-northeast1.run.app"
