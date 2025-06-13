@@ -14,13 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -34,7 +32,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,33 +43,38 @@ import com.example.team.R
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
-fun DiaryListContent(onMenuClick:() -> Unit = {},
-                     onDetailClick: (Int) -> Unit = {_ ->},
-                     navController: NavController,
-                     onCreateNewDiaryClick: () -> Unit = {},
-                     viewModel: DiaryViewModel
+fun DiaryListContent(
+    onMenuClick: () -> Unit = {},
+    onDetailClick: (Int) -> Unit = { _ -> },
+    navController: NavController,
+    onCreateNewDiaryClick: () -> Unit = {},
+    viewModel: DiaryViewModel
 ) {
 
-    val context = LocalContext.current
     val diaryList = viewModel.diaryList
-    val expandedStates = remember(diaryList.size) { mutableStateListOf(*List(diaryList.size) {false}.toTypedArray()) }
+    val expandedStates =
+        remember(diaryList.size) { mutableStateListOf(*List(diaryList.size) { false }.toTypedArray()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(16.dp)
-            .fillMaxHeight(1f)) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxHeight(1f)
+        ) {
             // 햄버거 메뉴
-            Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "메뉴",
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
                         .clickable { onMenuClick() }
 
                 )
             }
 
-            // 프로필
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
@@ -80,24 +82,23 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
                     modifier = Modifier
                         .size(54.dp)
                 )
-                
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text("AIKU 다이어리", fontWeight = FontWeight.Bold)
-                    Text("AI와 함께하는 영어 다이어리", color = Color.Gray)
+                    Text("AI와 함께하는 영어 일기단어장", color = Color.Gray)
                 }
             }
 
             Divider(modifier = Modifier.padding(vertical = 12.dp))
 
-            // 다이어리 목록
+            // 일기 목록
             LazyColumn {
                 itemsIndexed(diaryList) { index, diary ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
                     ) {
                         Column(
                             modifier = Modifier
@@ -118,8 +119,11 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
                             }
                             if (expandedStates[index]) {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(text = diary.content, maxLines = 1, overflow = TextOverflow.Ellipsis)
-
+                                Text(
+                                    text = diary.content,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     Spacer(modifier = Modifier.weight(1f))
@@ -138,7 +142,7 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
             }
         }
 
-        // FloatingActionButton for 새 일기
+        // 액션버튼들
         Row(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -155,7 +159,7 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
                     contentDescription = "단어장으로 이동"
                 )
             }
-            
+
             FloatingActionButton(
                 onClick = {
                     onCreateNewDiaryClick()
