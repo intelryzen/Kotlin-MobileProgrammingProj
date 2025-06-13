@@ -136,18 +136,33 @@ fun DiaryListContent(onMenuClick:() -> Unit = {},
         }
 
         // FloatingActionButton for 새 일기
-        FloatingActionButton(
-            onClick = {
-                onCreateNewDiaryClick()
-            },
+        Row(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "새 일기 추가"
-            )
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate("vocabulary")
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Book,
+                    contentDescription = "단어장으로 이동"
+                )
+            }
+            
+            FloatingActionButton(
+                onClick = {
+                    onCreateNewDiaryClick()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "새 일기 추가"
+                )
+            }
         }
     }
 }
