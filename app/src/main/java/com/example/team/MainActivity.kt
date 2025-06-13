@@ -11,6 +11,7 @@ import com.example.team.repository.DiaryRepository
 import com.example.team.repository.VocabularyRepository
 import com.example.team.ui.theme.TeamTheme
 import com.example.team.viewmodel.diary.DiaryViewModel
+import com.example.team.viewmodel.VocabularyViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +29,17 @@ class MainActivity : ComponentActivity() {
                 val diaryViewModel: DiaryViewModel = viewModel {
                     DiaryViewModel(diaryRepository, vocabularyRepository, chatRepository) 
                 }
+                
+                val vocabularyViewModel: VocabularyViewModel = viewModel {
+                    VocabularyViewModel(vocabularyRepository)
+                }
 
                 val navController = rememberNavController()
-                NavGraph(navController = navController, diaryViewModel = diaryViewModel)
+                NavGraph(
+                    navController = navController, 
+                    diaryViewModel = diaryViewModel,
+                    vocabularyViewModel = vocabularyViewModel
+                )
             }
         }
     }
