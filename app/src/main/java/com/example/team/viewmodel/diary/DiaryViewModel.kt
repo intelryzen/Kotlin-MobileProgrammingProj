@@ -67,10 +67,6 @@ class DiaryViewModel(
         }
     }
 
-    private fun getNextId(): Int {
-        return if (diaryList.isEmpty()) 0 else diaryList.maxOf { it.id } + 1
-    }
-
     fun deleteCurrentDiary(onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         val diary = currentDiary
         if (diary == null) {
@@ -159,7 +155,7 @@ class DiaryViewModel(
                     } catch (e: Exception) {
                         // 로드 실패 시 기존 방식으로 처리해야
                         val newDiary = DiaryViewState(
-                            id = getNextId(),
+                            id = if (diaryList.isEmpty()) 0 else diaryList.maxOf { it.id } + 1,
                             title = title,
                             content = content,
                             correctedContent = correctedContent,
