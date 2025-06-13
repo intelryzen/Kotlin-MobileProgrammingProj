@@ -192,12 +192,12 @@ fun WriteDiary(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (viewModel.isLoading) {
                     CircularProgressIndicator(
@@ -222,73 +222,92 @@ fun WriteDiary(
                                 }
                             )
                         },
-                        enabled = !viewModel.isLoading
+                        enabled = !viewModel.isLoading,
+                        modifier = Modifier.fillMaxWidth(0.8f)
                     ) {
                         Text("AI 교정 및 저장")
                     }
                 } else if (diary != null) {
-
                     // 기존 일기인 경우 수정, 삭제 버튼만 표시
-                    Button(
-                        onClick = {
-                            viewModel.updateCurrentDiary(
-                                onSuccess = { message ->
-                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                    // 수정 후 수정된 일기 탭으로 자동 전환
-                                    diary.isOriginal = false
-                                },
-                                onError = { error ->
-                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                                }
-                            )
-                        },
-                        enabled = !viewModel.isLoading
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Text("수정")
-                    }
-
-                    Button(
-                        onClick = {
-                            viewModel.deleteCurrentDiary(
-                                onSuccess = { message ->
-                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                    navController.popBackStack("main", inclusive = false)
-                                },
-                                onError = { error ->
-                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-                                }
-                            )
-                        },
-                        enabled = !viewModel.isLoading
-                    ) {
-                        Text("삭제")
-                    }
-
-                    // 수정된 일기 탭에서만 단어 수집 버튼 표시
-                    if (!diary.isOriginal) {
                         Button(
                             onClick = {
-                                viewModel.collectVocabularies(
-                                    onSuccess = { items ->
-                                        vocabularyItems = items
-                                        showVocabSelection = true
+                                viewModel.updateCurrentDiary(
+                                    onSuccess = { message ->
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                        // 수정 후 수정된 일기 탭으로 자동 전환
+                                        diary.isOriginal = false
                                     },
                                     onError = { error ->
                                         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
                                     }
                                 )
                             },
-                            enabled = !viewModel.isLoading
+                            enabled = !viewModel.isLoading,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Text("단어 수집")
+                            Text("수정")
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         Button(
                             onClick = {
-                                showPopup = true
+                                viewModel.deleteCurrentDiary(
+                                    onSuccess = { message ->
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                        navController.popBackStack("main", inclusive = false)
+                                    },
+                                    onError = { error ->
+                                        Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                    }
+                                )
                             },
-                            enabled = !viewModel.isLoading
+                            enabled = !viewModel.isLoading,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Text("Q&A")
+                            Text("삭제")
+                        }
+                    }
+
+                    // 수정된 일기 탭에서만 단어 수집 버튼 표시
+                    if (!diary.isOriginal) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(
+                                onClick = {
+                                    viewModel.collectVocabularies(
+                                        onSuccess = { items ->
+                                            vocabularyItems = items
+                                            showVocabSelection = true
+                                        },
+                                        onError = { error ->
+                                            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                        }
+                                    )
+                                },
+                                enabled = !viewModel.isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("단어 수집")
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Button(
+                                onClick = {
+                                    showPopup = true
+                                },
+                                enabled = !viewModel.isLoading,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Q&A")
+                            }
                         }
                     }
                 }
