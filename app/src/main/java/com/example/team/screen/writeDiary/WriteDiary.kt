@@ -205,7 +205,11 @@ fun WriteDiary(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isNewDiary) {
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                    )
+                } else if (isNewDiary) {
                     // 새 일기인 경우 저장 버튼만 표시
                     Button(
                         onClick = {
@@ -226,14 +230,7 @@ fun WriteDiary(
                         },
                         enabled = !viewModel.isLoading
                     ) {
-                        if (viewModel.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = Color.White
-                            )
-                        } else {
-                            Text("AI 교정")
-                        }
+                        Text("AI 교정")
                     }
                 } else if (diary != null) {
                     // 기존 일기인 경우 수정, 삭제 버튼만 표시
@@ -252,14 +249,7 @@ fun WriteDiary(
                         },
                         enabled = !viewModel.isLoading
                     ) {
-                        if (viewModel.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = Color.White
-                            )
-                        } else {
-                            Text("수정")
-                        }
+                        Text("수정")
                     }
 
                     Button(
@@ -276,14 +266,7 @@ fun WriteDiary(
                         },
                         enabled = !viewModel.isLoading
                     ) {
-                        if (viewModel.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = Color.White
-                            )
-                        } else {
-                            Text("삭제")
-                        }
+                        Text("삭제")
                     }
 
                     // 수정된 일기 탭에서만 단어 수집 버튼 표시
@@ -302,29 +285,15 @@ fun WriteDiary(
                             },
                             enabled = !viewModel.isLoading
                         ) {
-                            if (viewModel.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    color = Color.White
-                                )
-                            } else {
-                                Text("단어 수집")
-                            }
+                            Text("단어 수집")
                         }
                         Button(
                             onClick = {
-                               showPopup = true
+                                showPopup = true
                             },
                             enabled = !viewModel.isLoading
                         ) {
-                            if (viewModel.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    color = Color.White
-                                )
-                            } else {
-                                Text("Q&A")
-                            }
+                            Text("Q&A")
                         }
                     }
                 }

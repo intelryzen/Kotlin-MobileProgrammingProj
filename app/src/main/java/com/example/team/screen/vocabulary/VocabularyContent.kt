@@ -70,18 +70,19 @@ fun VocabularyContent(
                     .weight(1f)
             ) {
                 itemsIndexed(wordList) { index, vocab ->
-                    Column {
+                    Column(
+                        modifier = Modifier.clickable {
+                            val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            context.startActivity(intent)
+                        }
+                    ) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             "${index + 1}. ${vocab.word}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
-                            modifier = Modifier.clickable {
-                                val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                context.startActivity(intent)
-                            }
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text("${vocab.partOfSpeech} ${vocab.meaning}")

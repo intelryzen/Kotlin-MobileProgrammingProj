@@ -17,7 +17,7 @@ import java.util.Locale
 
 class DiaryRepository(private val diaryDao: DiaryDao) {
     
-    private val apiUrl = "https://stable-diffusion.mozilla-4-0-linux.workers.dev/api/aiku/diary-corrector"
+    private val apiUrl = "https://diary-corrector-473344676717.asia-northeast1.run.app/"
     
     suspend fun correctDiary(diaryText: String): Result<DiaryApiResponse> {
         return withContext(Dispatchers.IO) {
