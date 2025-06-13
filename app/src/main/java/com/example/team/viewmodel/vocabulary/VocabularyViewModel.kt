@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.team.model.VocabularyItem
 import com.example.team.repository.VocabularyRepository
+import com.example.team.model.VocabularyItem
 import kotlinx.coroutines.launch
 
 class VocabularyViewModel(private val repository: VocabularyRepository) : ViewModel() {
@@ -15,17 +15,14 @@ class VocabularyViewModel(private val repository: VocabularyRepository) : ViewMo
     var vocabularyList = mutableStateListOf<VocabularyItem>()
         private set
     
-    var isLoading by mutableStateOf(false)
-        private set
-    
     var errorMessage by mutableStateOf<String?>(null)
         private set
     
     init {
-        loadVocabularyFromDatabase()
+        loadVocabularyFromDB()
     }
     
-    private fun loadVocabularyFromDatabase() {
+    private fun loadVocabularyFromDB() {
         viewModelScope.launch {
             try {
                 val result = repository.getAllVocabulary()
@@ -49,6 +46,6 @@ class VocabularyViewModel(private val repository: VocabularyRepository) : ViewMo
     }
 
     fun refreshVocabulary() {
-        loadVocabularyFromDatabase()
+        loadVocabularyFromDB()
     }
 } 

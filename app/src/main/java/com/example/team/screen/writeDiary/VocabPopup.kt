@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.team.model.VocabularyItem
-import com.example.team.ui.theme.GreenGrey80
 import com.example.team.ui.theme.LightGreen80
 
 @Composable
