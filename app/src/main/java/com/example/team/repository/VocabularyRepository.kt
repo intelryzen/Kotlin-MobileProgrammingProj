@@ -137,4 +137,22 @@ class VocabularyRepository(private val vocabDao: VocabDao) {
             }
         }
     }
+
+    suspend fun deleteVocabularies(words: List<String>): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val vocabs = vocabDao.getAll().filter { it.word in words }
+                if (vocabs.isNotEmpty()) {
+                    vocabs.forEach { vocab ->
+                        vocabDao.delete(vocab)
+                    }
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("에러1"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 } 

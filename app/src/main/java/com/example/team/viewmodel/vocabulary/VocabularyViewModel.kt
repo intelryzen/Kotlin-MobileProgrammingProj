@@ -48,4 +48,21 @@ class VocabularyViewModel(private val repository: VocabularyRepository) : ViewMo
     fun refreshVocabulary() {
         loadVocabularyFromDB()
     }
+
+    fun deleteWords(words: List<VocabularyItem>) {
+        viewModelScope.launch {
+            try {
+                val wordStrings = words.map { it.word }
+                val result = repository.deleteVocabularies(wordStrings)
+                
+                if (result.isSuccess) {
+                    loadVocabularyFromDB()
+                } else {
+                    errorMessage = result.exceptionOrNull()?.message ?: "삭제 중 오류 발생"
+                }
+            } catch (e: Exception) {
+                errorMessage = "삭제 중 오류 발생: ${e.message}"
+            }
+        }
+    }
 } 

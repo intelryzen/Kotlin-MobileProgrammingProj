@@ -12,13 +12,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,9 +43,13 @@ import android.net.Uri
 fun VocabularyContent(
     wordList: List<VocabularyItem>,
     onMenuClick: () -> Unit = {},
-    onHomeClick: () -> Unit = {}
+    onHomeClick: () -> Unit = {},
+    onDeleteWords: (List<VocabularyItem>) -> Unit = {}
 ) {
     val context = LocalContext.current
+    var isDeleteMode by remember { mutableStateOf(false) }
+    var selectedWords by remember { mutableStateOf(mutableStateListOf<VocabularyItem>()) }
+    var showDeletePopup by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -49,7 +62,8 @@ fun VocabularyContent(
             // 고정 헤더임.
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
@@ -58,6 +72,38 @@ fun VocabularyContent(
                         .padding(bottom = 8.dp)
                         .clickable { onMenuClick() }
                 )
+                
+                if (isDeleteMode) {
+                    Row {
+                        Button(
+                            onClick = {
+                                if (selectedWords.isNotEmpty()) {
+                                    showDeletePopup = true
+                                }
+                            },
+                            enabled = selectedWords.isNotEmpty()
+                        ) {
+                            Text("삭제하기")
+                        }
+                        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                        Button(
+                            onClick = {
+                                isDeleteMode = false
+                                selectedWords.clear()
+                            }
+                        ) {
+                            Text("취소")
+                        }
+                    }
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .clickable { isDeleteMode = true }
+                    )
+                }
             }
 
             Text("단어장", fontSize = 28.sp, fontWeight = FontWeight.Bold)
@@ -73,16 +119,29 @@ fun VocabularyContent(
                 itemsIndexed(wordList) { index, vocab ->
                     Column(
                         modifier = Modifier.clickable {
-                            val url =
-                                "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            context.startActivity(intent)
+                            if (!isDeleteMode) {
+                                val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                context.startActivity(intent)
+                            }
                         }
                     ) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            if (isDeleteMode) {
+                                Checkbox(
+                                    checked = selectedWords.contains(vocab),
+                                    onCheckedChange = { checked ->
+                                        if (checked) {
+                                            selectedWords.add(vocab)
+                                        } else {
+                                            selectedWords.remove(vocab)
+                                        }
+                                    }
+                                )
+                            }
                             Text(
                                 "${index + 1}. ",
                                 fontSize = 16.sp,
@@ -131,5 +190,32 @@ fun VocabularyContent(
                 contentDescription = null
             )
         }
+    }
+
+    if (showDeletePopup) {
+        AlertDialog(
+            onDismissRequest = { showDeletePopup = false },
+            title = { Text("단어 삭제") },
+            text = { Text("${selectedWords.size}개의 단어를 삭제하시겠습니까?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeleteWords(selectedWords)
+                        isDeleteMode = false
+                        selectedWords.clear()
+                        showDeletePopup = false
+                    }
+                ) {
+                    Text("네")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDeletePopup = false }
+                ) {
+                    Text("아니오")
+                }
+            }
+        )
     }
 }

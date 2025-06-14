@@ -25,6 +25,9 @@ fun VocabularyScreen(
                 navController.navigate("main") {
                     popUpTo("main") { inclusive = true }
                 }
+            },
+            onDeleteWords = { words ->
+                vocabularyViewModel.deleteWords(words)
             }
         )
     }
