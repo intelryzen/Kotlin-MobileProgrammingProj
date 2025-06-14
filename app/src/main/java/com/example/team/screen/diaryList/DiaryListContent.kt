@@ -144,6 +144,11 @@ fun DiaryListContent(
                         }
                     }
                 }
+
+                // 하단 여백
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
             }
         }
 
