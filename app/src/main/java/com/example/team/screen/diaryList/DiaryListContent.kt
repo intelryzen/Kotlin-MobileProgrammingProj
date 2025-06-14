@@ -33,17 +33,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.team.R
-import com.example.team.ui.theme.Green80
 import com.example.team.ui.theme.GreenGrey80
-import com.example.team.ui.theme.LightGreen40
-import com.example.team.ui.theme.LightGreen80
 import com.example.team.viewmodel.diary.DiaryViewModel
 
 @Composable
@@ -56,7 +52,8 @@ fun DiaryListContent(
 ) {
 
     val diaryList = viewModel.diaryList
-    val expandedStates =
+    val expandedDiaries =
+        // boolean 타입으로 개수만큼 쭉 펼침
         remember(diaryList.size) { mutableStateListOf(*List(diaryList.size) { false }.toTypedArray()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -111,7 +108,7 @@ fun DiaryListContent(
                         Column(
                             modifier = Modifier
                                 .clickable {
-                                    expandedStates[index] = !expandedStates[index]
+                                    expandedDiaries[index] = !expandedDiaries[index]
                                 }
                                 .padding(16.dp)
                         ) {
@@ -121,11 +118,11 @@ fun DiaryListContent(
                             ) {
                                 Text(diary.title, fontWeight = FontWeight.Bold)
                                 Icon(
-                                    imageVector = if (expandedStates[index]) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                    imageVector = if (expandedDiaries[index]) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                                     contentDescription = null
                                 )
                             }
-                            if (expandedStates[index]) {
+                            if (expandedDiaries[index]) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = diary.content,

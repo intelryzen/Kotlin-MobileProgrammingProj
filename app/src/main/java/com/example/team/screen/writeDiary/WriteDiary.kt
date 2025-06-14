@@ -1,5 +1,6 @@
 package com.example.team.screen.writeDiary
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,30 +56,25 @@ fun WriteDiary(
     val diary = viewModel.currentDiary
     val isNewDiary = viewModel.currentDiaryIndex == -1
 
-    var showPopup by remember { mutableStateOf(false) }
-    var showVocabSelection by remember { mutableStateOf(false) }
+    var showQnAPopup by remember { mutableStateOf(false) }
+    var showVocabPopup by remember { mutableStateOf(false) }
     var vocabularyItems by remember { mutableStateOf<List<VocabularyItem>>(emptyList()) }
 
     // 뒤로가기 버튼 연속 클릭 방지
     var isBackButtonEnabled by remember { mutableStateOf(true) }
 
-    // 새 일기 작성용 상태 => diary가 변경될 때마다 업데이트
-    var title by remember(diary) { mutableStateOf(diary?.title ?: "") }
-    var content by remember(diary) { mutableStateOf(diary?.content ?: "") }
-
-    val dateTimeFormatter = remember {
-        SimpleDateFormat("yyyy년 M월 d일 (HH시 mm분)", Locale.getDefault())
-    }
-
     // 새 일기인지 기존 일기인지 판단하여 날짜 표시
-    val displayDateTime = remember(diary) {
-        if (diary != null) {
-            dateTimeFormatter.format(diary.createdAt)
-        } else {
-            dateTimeFormatter.format(Date())
+    val displayDateTime by remember {
+        derivedStateOf {
+            SimpleDateFormat("yyyy년 M월 d일 (HH시 mm분)", Locale.getDefault()).format(
+                diary?.createdAt ?: Date()
+            )
         }
     }
 
+    // 새 일기 작성용 상태 => diary가 변경될 때마다 업데이트
+    var title by remember(diary) { mutableStateOf(diary?.title ?: "") }
+    var content by remember(diary) { mutableStateOf(diary?.content ?: "") }
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -284,7 +281,7 @@ fun WriteDiary(
                                     viewModel.collectVocabularies(
                                         onSuccess = { items ->
                                             vocabularyItems = items
-                                            showVocabSelection = true
+                                            showVocabPopup = true
                                         },
                                         onError = { error ->
                                             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
@@ -301,7 +298,7 @@ fun WriteDiary(
 
                             Button(
                                 onClick = {
-                                    showPopup = true
+                                    showQnAPopup = true
                                 },
                                 enabled = !viewModel.isLoading,
                                 modifier = Modifier.weight(1f)
@@ -314,14 +311,14 @@ fun WriteDiary(
             }
         }
 
-        if (showPopup) {
+        if (showQnAPopup) {
             QnAPopup(
                 viewModel = viewModel,
-                onClose = { showPopup = false }
+                onClose = { showQnAPopup = false }
             )
         }
 
-        if (showVocabSelection) {
+        if (showVocabPopup) {
             VocabPopup(
                 vocabularyItems = vocabularyItems,
                 onSaveSelected = { selectedItems ->
@@ -330,7 +327,7 @@ fun WriteDiary(
                         onSuccess = { message ->
                             diary?.let { it.wordCollect = true }
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            showVocabSelection = false
+                            showVocabPopup = false
                         },
                         onError = { error ->
                             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
@@ -341,7 +338,7 @@ fun WriteDiary(
                     )
                 },
                 onDismiss = {
-                    showVocabSelection = false
+                    showVocabPopup = false
                 }
             )
         }
