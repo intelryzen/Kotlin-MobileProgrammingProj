@@ -72,7 +72,7 @@ fun VocabularyContent(
                         .padding(bottom = 8.dp)
                         .clickable { onMenuClick() }
                 )
-                
+
                 if (isDeleteMode) {
                     Row {
                         Button(
@@ -120,9 +120,16 @@ fun VocabularyContent(
                     Column(
                         modifier = Modifier.clickable {
                             if (!isDeleteMode) {
-                                val url = "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
+                                val url =
+                                    "https://en.dict.naver.com/#/search?query=${Uri.encode(vocab.word)}"
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                 context.startActivity(intent)
+                            } else {
+                                if (selectedWords.contains(vocab)) {
+                                    selectedWords.remove(vocab)
+                                } else {
+                                    selectedWords.add(vocab)
+                                }
                             }
                         }
                     ) {
